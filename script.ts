@@ -4,11 +4,11 @@ const HEIGHT = 800;
 let ctx: CanvasRenderingContext2D;
 
 const leftSide = new Image();
-leftSide.src = "./assets/leftSide.jpg";
+leftSide.src = "./assets/leftSide.png";
 const rightSide = new Image();
-rightSide.src = "./assets/rightSide.jpg";
+rightSide.src = "./assets/rightSide.png";
 const log = new Image();
-log.src = "./assets/log.jpg";
+log.src = "./assets/log.png";
 
 let scrollSpeed = 10;
 let cameraHeight = 800;
@@ -72,7 +72,7 @@ window.onload = function(){
     for(let i = 0; i < numPlatforms; i++){
         platforms[platforms.length] = new Platform(Math.floor(Math.random() * WIDTH), i * 500, Math.floor(Math.random() * 1000), (Math.random() <= 0.5) ? "left" : "right") // testing platform + cool camera
     }
-    player = new Player(WIDTH/2, 50, 100, 100, leftSide);
+    player = new Player(WIDTH/2, 50, 100, 100, log);
     // Creates the game loop
     setInterval(update, 16); // 60 fps
 }
