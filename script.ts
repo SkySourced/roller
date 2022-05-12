@@ -18,6 +18,13 @@ let numPlatforms = 100;
 let platforms: Platform[];
 let player: Player;
 
+let keysPressed = {
+    left: false,
+    right: false,
+    z: false,
+    x: false
+}
+
 class Platform {
     x: number;
     y: number;
@@ -69,29 +76,37 @@ class Player {
         ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
     }
     jump(){
-        for(let jump = this.jumpHeight; jump <= 0; jump--){
-            this.y -= jump; // still needs gravity;
+        if(keysPressed.z){
+            console.log("jumping");
+            for(let jump = this.jumpHeight; jump <= 0; jump--){
+                this.y -= jump; // still needs gravity;
+            }
         }
     }
     dash(){
-        this.dashing = true;
-        let currentY = this.y;
-        for(let dash = this.dashLength; dash >= 0; dash/2){
-            this.y = currentY;
-            if(this.facing == "left"){
-                this.x -= dash;
+        if(keysPressed.x){
+            console.log("dashing");
+            this.dashing = true;
+            let currentY = this.y;
+            for(let dash = this.dashLength; dash >= 0; dash/2){
+                this.y = currentY;
+                if(this.facing == "left"){
+                    this.x -= dash;
+                }
+                if(this.facing == "right"){
+                    this.x += dash;
+                }
             }
-            if(this.facing == "right"){
-                this.x += dash;
-            }
+            this.dashing = false;
         }
     }
-    move(direction: "left" | "right"){
-        this.facing = direction;
+    move(){
         if(!this.dashing){
-            if(direction == "left"){
+            if(keysPressed.left){
+                this.facing = "left";
                 this.x -= this.speed;
-            } else if (direction == "right"){
+            } else if (keysPressed.right){
+                this.facing = "right";
                 this.x += this.speed;
             }
         }
@@ -110,13 +125,24 @@ window.onload = function(){
     setInterval(update, 16.66); // 60 fps
     document.addEventListener("keydown", function(event){
         if(event.key == "ArrowLeft"){
-            player.move("left");
+            keysPressed.left = true;
         } else if (event.key == "ArrowRight"){
-            player.move("right");
-        } else if (event.key == "Z"){
-            player.jump();
-        } else if (event.key == "X" || event.key == "C"){
-            player.dash();
+            keysPressed.right = true;
+        } else if (event.key == "z"){
+            keysPressed.z = true;
+        } else if (event.key == "x" || event.key == "c"){
+            keysPressed.x = true;
+        }
+    })
+    document.addEventListener("keyup", function(event){
+        if(event.key == "ArrowLeft"){
+            keysPressed.left = false;
+        } else if (event.key == "ArrowRight"){
+            keysPressed.right = false;
+        } else if (event.key == "z"){
+            keysPressed.z = false;
+        } else if (event.key == "x" || event.key == "c"){
+            keysPressed.x = false;
         }
     })
 }
@@ -132,6 +158,10 @@ function update(){ // this loop runs 60 times per second
     }
     // Draws the player
     player.draw(ctx);
+    // Moves the player
+    player.move();
+    player.jump();
+    player.dash();
     // Draws the side images
     ctx.drawImage(leftSide, 45, 0, 45, HEIGHT);
     ctx.drawImage(rightSide, WIDTH - rightSide.width/2, 0, 45, HEIGHT);
