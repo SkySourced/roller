@@ -108,6 +108,17 @@ window.onload = function(){
     player = new Player(WIDTH/2, HEIGHT-50, 100, 100, log);
     // Creates the game loop
     setInterval(update, 16.66); // 60 fps
+    document.addEventListener("keydown", function(event){
+        if(event.key == "ArrowLeft"){
+            player.move("left");
+        } else if (event.key == "ArrowRight"){
+            player.move("right");
+        } else if (event.key == "Z"){
+            player.jump();
+        } else if (event.key == "X" || event.key == "C"){
+            player.dash();
+        }
+    })
 }
 function update(){ // this loop runs 60 times per second
     // Clears the canvas
