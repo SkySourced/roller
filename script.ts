@@ -78,7 +78,7 @@ class Player {
     jump(){
         if(keysPressed.z){
             console.log("jumping");
-            for(let jump = this.jumpHeight; jump <= 0; jump--){
+            for(let jump = this.jumpHeight; jump < 0; jump--){
                 this.y -= jump; // still needs gravity;
             }
         }
@@ -88,13 +88,13 @@ class Player {
             console.log("dashing");
             this.dashing = true;
             let currentY = this.y;
-            for(let dash = this.dashLength; dash >= 0; dash/2){
+            for(let i = 0; i >= this.dashLength; i++){
                 this.y = currentY;
                 if(this.facing == "left"){
-                    this.x -= dash;
+                    this.x--;
                 }
                 if(this.facing == "right"){
-                    this.x += dash;
+                    this.x++;
                 }
             }
             this.dashing = false;
@@ -109,6 +109,12 @@ class Player {
                 this.facing = "right";
                 this.x += this.speed;
             }
+        }
+        if(this.x < 45){
+            this.x = 45;
+        }
+        if(this.x > WIDTH - this.width - 45){
+            this.x = WIDTH - this.width - 45;
         }
     }
 }
@@ -163,8 +169,8 @@ function update(){ // this loop runs 60 times per second
     player.jump();
     player.dash();
     // Draws the side images
-    ctx.drawImage(leftSide, 45, 0, 45, HEIGHT);
-    ctx.drawImage(rightSide, WIDTH - rightSide.width/2, 0, 45, HEIGHT);
+    ctx.drawImage(leftSide, 0, 0, 45, HEIGHT);
+    ctx.drawImage(rightSide, WIDTH - rightSide.width, 0, 45, HEIGHT);
     // Debugging
     console.log(cameraHeight);
     console.log(platforms);

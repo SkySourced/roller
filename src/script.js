@@ -59,7 +59,7 @@ var Player = /** @class */ (function () {
     Player.prototype.jump = function () {
         if (keysPressed.z) {
             console.log("jumping");
-            for (var jump = this.jumpHeight; jump <= 0; jump--) {
+            for (var jump = this.jumpHeight; jump < 0; jump--) {
                 this.y -= jump; // still needs gravity;
             }
         }
@@ -69,13 +69,13 @@ var Player = /** @class */ (function () {
             console.log("dashing");
             this.dashing = true;
             var currentY = this.y;
-            for (var dash = this.dashLength; dash >= 0; dash / 2) {
+            for (var i = 0; i >= this.dashLength; i++) {
                 this.y = currentY;
                 if (this.facing == "left") {
-                    this.x -= dash;
+                    this.x--;
                 }
                 if (this.facing == "right") {
-                    this.x += dash;
+                    this.x++;
                 }
             }
             this.dashing = false;
@@ -91,6 +91,12 @@ var Player = /** @class */ (function () {
                 this.facing = "right";
                 this.x += this.speed;
             }
+        }
+        if (this.x < 45) {
+            this.x = 45;
+        }
+        if (this.x > WIDTH - this.width - 45) {
+            this.x = WIDTH - this.width - 45;
         }
     };
     return Player;
@@ -152,9 +158,9 @@ function update() {
     player.jump();
     player.dash();
     // Draws the side images
-    ctx.drawImage(leftSide, 45, 0, 45, HEIGHT);
-    ctx.drawImage(rightSide, WIDTH - rightSide.width / 2, 0, 45, HEIGHT);
+    ctx.drawImage(leftSide, 0, 0, 45, HEIGHT);
+    ctx.drawImage(rightSide, WIDTH - rightSide.width, 0, 45, HEIGHT);
     // Debugging
-    console.log(cameraHeight);
-    console.log(platforms);
+    //console.log(cameraHeight);
+    //console.log(platforms);
 }
