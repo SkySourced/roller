@@ -59,18 +59,22 @@ class Player {
     dashLength: number;
     facing: "left" | "right";
     dashing: boolean;
-    speed: number;
+    moveSpeed: number;
+    ySpeed: number;
+    onGround: boolean;
     constructor(x: number, y: number, width: number, height: number, image: HTMLImageElement){
         this.x = x;
         this.y = y;
         this.width = width;
         this.height = height;
         this.image = image;
-        this.speed = 10;
+        this.moveSpeed = 10;
         this.jumpHeight = 10;
         this.dashLength = 100;
         this.facing = "right";
         this.dashing = false;
+        this.ySpeed = 0;
+        this.onGround = false;
     }
     draw(ctx: CanvasRenderingContext2D){
         ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
@@ -78,9 +82,8 @@ class Player {
     jump(){
         if(keysPressed.z){
             console.log("jumping");
-            for(let jump = this.jumpHeight; jump < 0; jump--){
-                this.y -= jump; // still needs gravity;
-            }
+            this.ySpeed = -10;
+            this.onGround = false;
         }
     }
     dash(){
@@ -102,12 +105,13 @@ class Player {
     }
     move(){
         if(!this.dashing){
+            this.y += this.ySpeed;
             if(keysPressed.left){
                 this.facing = "left";
-                this.x -= this.speed;
+                this.x -= this.moveSpeed;
             } else if (keysPressed.right){
                 this.facing = "right";
-                this.x += this.speed;
+                this.x += this.moveSpeed;
             }
         }
         if(this.x < 45){
