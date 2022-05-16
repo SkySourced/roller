@@ -4,12 +4,12 @@ const HEIGHT = 800;
 let ctx: CanvasRenderingContext2D;
 let canvas: HTMLCanvasElement;
 
-const leftSide = new Image();
-leftSide.src = "./assets/leftSide.png";
-const rightSide = new Image();
-rightSide.src = "./assets/rightSide.png";
-const log = new Image();
-log.src = "./assets/log.png";
+const LEFTSIDE = new Image();
+LEFTSIDE.src = "./assets/leftSide.png";
+const RIGHTSIDE = new Image();
+RIGHTSIDE.src = "./assets/rightSide.png";
+const LOG = new Image();
+LOG.src = "./assets/log.png";
 
 let scrollSpeed = 10;
 let cameraHeight = 800;
@@ -77,7 +77,7 @@ class Player {
         this.onGround = false;
     }
     draw(ctx: CanvasRenderingContext2D){
-        ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
+        ctx.drawImage(this.image, this.x, this.y - cameraHeight, this.width, this.height);
     }
     jump(){
         if(keysPressed.z){
@@ -105,13 +105,23 @@ class Player {
     }
     move(){
         if(!this.dashing){
-            this.y += this.ySpeed;
+            this.y -= this.ySpeed;
             if(keysPressed.left){
                 this.facing = "left";
                 this.x -= this.moveSpeed;
+                for(let i = 0; i < platforms.length; i++){
+                    if(this.x < platforms[i].x + platforms[i].width && this.x + this.width > platforms[i].x && this.y + this.height > platforms[i].y && this.y < platforms[i].y + platforms[i].height){
+                        this.x += this.moveSpeed;
+                    }
+                }
             } else if (keysPressed.right){
                 this.facing = "right";
                 this.x += this.moveSpeed;
+                for(let i = 0; i < platforms.length; i++){
+                    if(this.x < platforms[i].x + platforms[i].width && this.x + this.width > platforms[i].x && this.y + this.height > platforms[i].y && this.y < platforms[i].y + platforms[i].height){
+                        this.x -= this.moveSpeed;
+                    }
+                }
             }
         }
         if(this.x < 45){
@@ -130,7 +140,8 @@ window.onload = function(){
     for(let i = 0; i < numPlatforms; i++){
         platforms[platforms.length] = new Platform(Math.floor(Math.random() * WIDTH), i * 500, Math.floor(Math.random() * 1000), (Math.random() <= 0.5) ? "left" : "right") // testing platform + cool camera
     }
-    player = new Player(WIDTH/2, HEIGHT-50, 100, 100, log);
+    // Creates the player
+    player = new Player(WIDTH/2, HEIGHT-50, 100, 100, LOG);
     // Creates the game loop
     setInterval(update, 16.66); // 60 fps
     document.addEventListener("keydown", function(event){
@@ -166,6 +177,14 @@ function update(){ // this loop runs 60 times per second
     for(let i = 0; i < platforms.length; i++){
         platforms[i].draw(ctx)
     }
+    // Gravity
+    for(let i = 0; i < platforms.length; i++){
+        if(player.y + player.height > platforms[i].y && player.y + player.height < platforms[i].y + platforms[i].height){ // y collision
+            player.onGround = true;
+        } else {
+            //player.ySpeed += .1;
+        }
+    }
     // Draws the player
     player.draw(ctx);
     // Moves the player
@@ -173,9 +192,14 @@ function update(){ // this loop runs 60 times per second
     player.jump();
     player.dash();
     // Draws the side images
-    ctx.drawImage(leftSide, 0, 0, 45, HEIGHT);
-    ctx.drawImage(rightSide, WIDTH - rightSide.width, 0, 45, HEIGHT);
+    ctx.drawImage(LEFTSIDE, 0, 0, 45, HEIGHT);
+    ctx.drawImage(RIGHTSIDE, WIDTH - RIGHTSIDE.width, 0, 45, HEIGHT);
+    platforms.forEach(element => {
+        if(player.x + player.width > element.x && player.x < element.x + element.width && player.y + player.height > element.y && player.y < element.y + element.height){
+            console.log("collision with " + element);
+        }
+    });
     // Debugging
-    console.log(cameraHeight);
-    console.log(platforms);
+    //console.log(cameraHeight);
+    //console.log(platforms);
 }
