@@ -8,7 +8,7 @@ var RIGHTSIDE = new Image();
 RIGHTSIDE.src = "./assets/rightSide.png";
 var LOG = new Image();
 LOG.src = "./assets/log.png";
-var scrollSpeed = 2;
+var scrollSpeed = 5;
 var cameraHeight = 800;
 var platformHeight = 100;
 var numPlatforms = 100;
@@ -48,44 +48,49 @@ var Player = /** @class */ (function () {
         this.height = height;
         this.image = image;
         this.moveSpeed = 10;
-        this.jumpHeight = 10;
+        this.jumpHeight = 70;
         this.dashLength = 100;
         this.facing = "right";
         this.dashing = false;
         this.ySpeed = 0;
         this.onGround = false;
+        this.canDash = false;
     }
     Player.prototype.draw = function (ctx) {
         ctx.drawImage(this.image, this.x, cameraHeight - this.y, this.width, this.height);
-        console.log(cameraHeight - this.y, cameraHeight)
+        console.log(cameraHeight - this.y, cameraHeight);
     };
     Player.prototype.jump = function () {
         if (keysPressed.z && this.onGround) {
             console.log("jumping");
-            this.ySpeed = -10;
+            this.ySpeed = -this.jumpHeight;
             this.onGround = false;
         }
     };
     Player.prototype.dash = function () {
-        if (keysPressed.x && !this.dashing) {
+        if (this.canDash && !this.dashing) {
             console.log("dashing");
             this.dashing = true;
-            if(this.facing == "right"&& this.x + this.dashLength < WIDTH -45){
+            if (this.facing == "right" && this.x + this.dashLength < WIDTH - 45) {
                 this.x += this.dashLength;
-            } else if (this.facing == "left" && this.x - this.dashLength > 45) {
+            }
+            else if (this.facing == "left" && this.x - this.dashLength > 45) {
                 this.x -= this.dashLength;
-            } else if (this.facing == "right" && this.x + this.dashLength > WIDTH - 45){
+            }
+            else if (this.facing == "right" && this.x + this.dashLength > WIDTH - 45) {
                 this.x == WIDTH - 45;
-            } else if (this.facing == "left" && this.x - this.dashLength < 45) {
+            }
+            else if (this.facing == "left" && this.x - this.dashLength < 45) {
                 this.x == 45;
             }
-            this.dashing = false; 
+            this.dashing = false;
         }
     };
     Player.prototype.move = function () {
         if (!this.dashing) {
             this.y -= this.ySpeed;
             if (keysPressed.left) {
+                console.log("moving left");
                 this.facing = "left";
                 this.x -= this.moveSpeed;
                 for (var i = 0; i < platforms.length; i++) {
@@ -95,6 +100,7 @@ var Player = /** @class */ (function () {
                 }
             }
             else if (keysPressed.right) {
+                console.log("moving right");
                 this.facing = "right";
                 this.x += this.moveSpeed;
                 for (var i = 0; i < platforms.length; i++) {
@@ -137,6 +143,8 @@ window.onload = function () {
         }
         else if (event.key == "x" || event.key == "c") {
             keysPressed.x = true;
+            player.dash();
+            player.canDash = false;
         }
     });
     document.addEventListener("keyup", function (event) {
@@ -151,6 +159,7 @@ window.onload = function () {
         }
         else if (event.key == "x" || event.key == "c") {
             keysPressed.x = false;
+            player.canDash = true;
         }
     });
 };
@@ -159,7 +168,7 @@ function update() {
     ctx.fillStyle = "white";
     ctx.fillRect(0, 0, WIDTH, HEIGHT);
     // Increases camera height
-    cameraHeight += scrollSpeed;
+    //cameraHeight += scrollSpeed;
     // Draws the platforms
     for (var i = 0; i < platforms.length; i++) {
         platforms[i].draw(ctx);
@@ -169,24 +178,29 @@ function update() {
     // Moves the player
     player.move();
     player.jump();
-    player.dash();
     // Draws the side images
     ctx.drawImage(LEFTSIDE, 0, 0, 45, HEIGHT);
     ctx.drawImage(RIGHTSIDE, WIDTH - RIGHTSIDE.width, 0, 45, HEIGHT);
     // Gravity
-    platforms.forEach(element => {
-        if(player.x + player.width > element.x && player.x < element.x + element.width && player.y + player.height > element.y && player.y < element.y + element.height){
+    platforms.forEach(function (element) {
+        if (player.x + player.width > element.x && player.x < element.x + element.width && player.y + player.height > element.y && player.y < element.y + element.height) {
             console.log("collision with " + element);
-            player.ySpeed = 0;
+            if (player.ySpeed > 0) {
+                player.ySpeed = 0;
+            }
             player.onGround = true;
-        } else if (!player.onGround){
-            player.ySpeed += 0.1;
-            if(player.ySpeed > 2){
-                player.ySpeed = 2;
+        }
+        else if (!player.onGround) {
+            if (player.ySpeed == 0) {
+                player.ySpeed += 0.1;
+            }
+            if (player.ySpeed > 5) {
+                player.ySpeed = 5;
             }
         }
     });
     // Debugging
     //console.log(cameraHeight);
     //console.log(platforms);
+    console.log(player.ySpeed);
 }

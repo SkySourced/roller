@@ -62,6 +62,7 @@ class Player {
     moveSpeed: number;
     ySpeed: number;
     onGround: boolean;
+    canDash: boolean;
     constructor(x: number, y: number, width: number, height: number, image: HTMLImageElement){
         this.x = x;
         this.y = y;
@@ -69,26 +70,27 @@ class Player {
         this.height = height;
         this.image = image;
         this.moveSpeed = 10;
-        this.jumpHeight = 10;
+        this.jumpHeight = 70;
         this.dashLength = 100;
         this.facing = "right";
         this.dashing = false;
         this.ySpeed = 0;
         this.onGround = false;
+        this.canDash = false;
     }
     draw(ctx: CanvasRenderingContext2D){
-        ctx.drawImage(this.image, this.x, cameraHeight % this.y, this.width, this.height);
+        ctx.drawImage(this.image, this.x, cameraHeight - this.y, this.width, this.height);
         console.log(cameraHeight - this.y, cameraHeight)
     }
     jump(){
         if(keysPressed.z && this.onGround){
             console.log("jumping");
-            this.ySpeed = -10;
+            this.ySpeed = -this.jumpHeight;
             this.onGround = false;
         }
     }
     dash(){
-        if (keysPressed.x && !this.dashing) {
+        if (this.canDash && !this.dashing) {
             console.log("dashing");
             this.dashing = true;
             if(this.facing == "right"&& this.x + this.dashLength < WIDTH -45){
@@ -107,6 +109,8 @@ class Player {
         if(!this.dashing){
             this.y -= this.ySpeed;
             if(keysPressed.left){
+                console.log("moving left");
+                
                 this.facing = "left";
                 this.x -= this.moveSpeed;
                 for(let i = 0; i < platforms.length; i++){
@@ -115,6 +119,8 @@ class Player {
                     }
                 }
             } else if (keysPressed.right){
+                console.log("moving right");
+                
                 this.facing = "right";
                 this.x += this.moveSpeed;
                 for(let i = 0; i < platforms.length; i++){
@@ -153,6 +159,8 @@ window.onload = function(){
             keysPressed.z = true;
         } else if (event.key == "x" || event.key == "c"){
             keysPressed.x = true;
+            player.dash()
+            player.canDash = false;
         }
     })
     document.addEventListener("keyup", function(event){
@@ -164,6 +172,7 @@ window.onload = function(){
             keysPressed.z = false;
         } else if (event.key == "x" || event.key == "c"){
             keysPressed.x = false;
+            player.canDash = true;
         }
     })
 }
@@ -172,7 +181,7 @@ function update(){ // this loop runs 60 times per second
     ctx.fillStyle = "white";
     ctx.fillRect(0, 0, WIDTH, HEIGHT);
     // Increases camera height
-    cameraHeight += scrollSpeed;
+    //cameraHeight += scrollSpeed;
     // Draws the platforms
     for(let i = 0; i < platforms.length; i++){
         platforms[i].draw(ctx)
@@ -182,7 +191,6 @@ function update(){ // this loop runs 60 times per second
     // Moves the player
     player.move();
     player.jump();
-    player.dash();
     // Draws the side images
     ctx.drawImage(LEFTSIDE, 0, 0, 45, HEIGHT);
     ctx.drawImage(RIGHTSIDE, WIDTH - RIGHTSIDE.width, 0, 45, HEIGHT);
@@ -190,16 +198,22 @@ function update(){ // this loop runs 60 times per second
     platforms.forEach(element => {
         if(player.x + player.width > element.x && player.x < element.x + element.width && player.y + player.height > element.y && player.y < element.y + element.height){
             console.log("collision with " + element);
-            player.ySpeed = 0;
+            if(player.ySpeed > 0){
+                player.ySpeed = 0;
+            }
             player.onGround = true;
         } else if (!player.onGround){
-            player.ySpeed += 0.1;
-            if(player.ySpeed > 2){
-                player.ySpeed = 2;
+            if(player.ySpeed == 0){
+                player.ySpeed += 0.1;
+            } 
+            player.ySpeed *= 1.1
+            if(player.ySpeed > 5){
+                player.ySpeed = 5;
             }
         }
     });
     // Debugging
     //console.log(cameraHeight);
     //console.log(platforms);
+    console.log(player.ySpeed)
 }
