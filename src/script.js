@@ -1,5 +1,7 @@
 var WIDTH = 800;
 var HEIGHT = 800;
+var GRAVITY = 1.1;
+var SPEED_CAP = 5;
 var ctx;
 var canvas;
 var LEFTSIDE = new Image();
@@ -8,7 +10,7 @@ var RIGHTSIDE = new Image();
 RIGHTSIDE.src = "./assets/rightSide.png";
 var LOG = new Image();
 LOG.src = "./assets/log.png";
-var scrollSpeed = 5;
+var scrollSpeed = 0.1;
 var cameraHeight = 800;
 var platformHeight = 100;
 var numPlatforms = 100;
@@ -49,19 +51,20 @@ var Player = /** @class */ (function () {
         this.image = image;
         this.moveSpeed = 10;
         this.jumpHeight = 70;
-        this.dashLength = 100;
+        this.dashLength = 170;
         this.facing = "right";
         this.dashing = false;
         this.ySpeed = 0;
         this.onGround = false;
         this.canDash = false;
+        this.canJump = false;
     }
     Player.prototype.draw = function (ctx) {
         ctx.drawImage(this.image, this.x, cameraHeight - this.y, this.width, this.height);
         console.log(cameraHeight - this.y, cameraHeight);
     };
     Player.prototype.jump = function () {
-        if (keysPressed.z && this.onGround) {
+        if (this.canJump && this.onGround) {
             console.log("jumping");
             this.ySpeed = -this.jumpHeight;
             this.onGround = false;
@@ -140,6 +143,8 @@ window.onload = function () {
         }
         else if (event.key == "z") {
             keysPressed.z = true;
+            player.jump();
+            player.canJump = false;
         }
         else if (event.key == "x" || event.key == "c") {
             keysPressed.x = true;
@@ -156,6 +161,7 @@ window.onload = function () {
         }
         else if (event.key == "z") {
             keysPressed.z = false;
+            player.canJump = true;
         }
         else if (event.key == "x" || event.key == "c") {
             keysPressed.x = false;
@@ -168,7 +174,7 @@ function update() {
     ctx.fillStyle = "white";
     ctx.fillRect(0, 0, WIDTH, HEIGHT);
     // Increases camera height
-    //cameraHeight += scrollSpeed;
+    cameraHeight += scrollSpeed;
     // Draws the platforms
     for (var i = 0; i < platforms.length; i++) {
         platforms[i].draw(ctx);
@@ -191,11 +197,23 @@ function update() {
             player.onGround = true;
         }
         else if (!player.onGround) {
-            if (player.ySpeed == 0) {
+            if (player.ySpeed == 0) { // initial boost
                 player.ySpeed += 0.1;
             }
-            if (player.ySpeed > 5) {
-                player.ySpeed = 5;
+            if (player.ySpeed > 0) { // gravity
+                player.ySpeed *= GRAVITY;
+            }
+            if (player.ySpeed < 0) { // jump deceleration
+                player.ySpeed *= GRAVITY - (GRAVITY - 1);
+            }
+            if (player.ySpeed > -0.01 && player.ySpeed < 0) { // reset at low speeds
+                player.ySpeed = 0;
+            }
+            if (player.ySpeed > SPEED_CAP) { // speed cap (down)
+                player.ySpeed = SPEED_CAP;
+            }
+            if (player.ySpeed > -SPEED_CAP) { // speed cap (up)
+                player.ySpeed = -SPEED_CAP;
             }
         }
     });

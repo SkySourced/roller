@@ -1,5 +1,7 @@
 const WIDTH = 800;
 const HEIGHT = 800;
+const GRAVITY = 1.1;
+const SPEED_CAP = 5;
 
 let ctx: CanvasRenderingContext2D;
 let canvas: HTMLCanvasElement;
@@ -11,7 +13,7 @@ RIGHTSIDE.src = "./assets/rightSide.png";
 const LOG = new Image();
 LOG.src = "./assets/log.png";
 
-let scrollSpeed = 5;
+let scrollSpeed = 0.1;
 let cameraHeight = 800;
 let platformHeight = 100;
 let numPlatforms = 100;
@@ -63,6 +65,7 @@ class Player {
     ySpeed: number;
     onGround: boolean;
     canDash: boolean;
+    canJump: boolean;
     constructor(x: number, y: number, width: number, height: number, image: HTMLImageElement){
         this.x = x;
         this.y = y;
@@ -71,19 +74,20 @@ class Player {
         this.image = image;
         this.moveSpeed = 10;
         this.jumpHeight = 70;
-        this.dashLength = 100;
+        this.dashLength = 170;
         this.facing = "right";
         this.dashing = false;
         this.ySpeed = 0;
         this.onGround = false;
         this.canDash = false;
+        this.canJump = false;
     }
     draw(ctx: CanvasRenderingContext2D){
         ctx.drawImage(this.image, this.x, cameraHeight - this.y, this.width, this.height);
         console.log(cameraHeight - this.y, cameraHeight)
     }
     jump(){
-        if(keysPressed.z && this.onGround){
+        if(this.canJump && this.onGround){
             console.log("jumping");
             this.ySpeed = -this.jumpHeight;
             this.onGround = false;
@@ -157,6 +161,8 @@ window.onload = function(){
             keysPressed.right = true;
         } else if (event.key == "z"){
             keysPressed.z = true;
+            player.jump();
+            player.canJump = false;
         } else if (event.key == "x" || event.key == "c"){
             keysPressed.x = true;
             player.dash()
@@ -170,6 +176,7 @@ window.onload = function(){
             keysPressed.right = false;
         } else if (event.key == "z"){
             keysPressed.z = false;
+            player.canJump = true;
         } else if (event.key == "x" || event.key == "c"){
             keysPressed.x = false;
             player.canDash = true;
@@ -181,7 +188,7 @@ function update(){ // this loop runs 60 times per second
     ctx.fillStyle = "white";
     ctx.fillRect(0, 0, WIDTH, HEIGHT);
     // Increases camera height
-    //cameraHeight += scrollSpeed;
+    cameraHeight += scrollSpeed;
     // Draws the platforms
     for(let i = 0; i < platforms.length; i++){
         platforms[i].draw(ctx)
@@ -203,12 +210,23 @@ function update(){ // this loop runs 60 times per second
             }
             player.onGround = true;
         } else if (!player.onGround){
-            if(player.ySpeed == 0){
+            if(player.ySpeed == 0){ // initial boost
                 player.ySpeed += 0.1;
             } 
-            player.ySpeed *= 1.1
-            if(player.ySpeed > 5){
-                player.ySpeed = 5;
+            if (player.ySpeed > 0){ // gravity
+                player.ySpeed *= GRAVITY;
+            }
+            if (player.ySpeed < 0){ // jump deceleration
+                player.ySpeed *= GRAVITY - (GRAVITY - 1);
+            }
+            if (player.ySpeed > -0.01 && player.ySpeed < 0){ // reset at low speeds
+                player.ySpeed = 0;
+            }
+            if (player.ySpeed > SPEED_CAP){ // speed cap (down)
+                player.ySpeed = SPEED_CAP;
+            }
+            if (player.ySpeed > -SPEED_CAP) { // speed cap (up)
+                player.ySpeed = -SPEED_CAP;
             }
         }
     });
