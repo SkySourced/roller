@@ -1,7 +1,7 @@
 var WIDTH = 800;
 var HEIGHT = 800;
-var GRAVITY = 1.1;
-var SPEED_CAP = 5;
+var GRAVITY = 0.07;
+var SPEED_CAP = 10;
 var ctx;
 var canvas;
 var LEFTSIDE = new Image();
@@ -10,9 +10,9 @@ var RIGHTSIDE = new Image();
 RIGHTSIDE.src = "./assets/rightSide.png";
 var LOG = new Image();
 LOG.src = "./assets/log.png";
-var scrollSpeed = 0.1;
-var cameraHeight = 800;
-var platformHeight = 100;
+var scrollSpeed = 1; // speed the camera scrolls at
+var cameraHeight = 800; // height the camera starts at
+var platformHeight = 100; // height of platforms
 var numPlatforms = 100;
 var platforms;
 var player;
@@ -54,7 +54,7 @@ var Player = /** @class */ (function () {
         this.dashLength = 170;
         this.facing = "right";
         this.dashing = false;
-        this.ySpeed = 0;
+        this.ySpeed = 0.1;
         this.onGround = false;
         this.canDash = false;
         this.canJump = false;
@@ -64,7 +64,7 @@ var Player = /** @class */ (function () {
         console.log(cameraHeight - this.y, cameraHeight);
     };
     Player.prototype.jump = function () {
-        if (this.canJump && this.onGround) {
+        if (this.canJump && this.onGround && keysPressed.z) {
             console.log("jumping");
             this.ySpeed = -this.jumpHeight;
             this.onGround = false;
@@ -128,7 +128,7 @@ window.onload = function () {
     ctx = canvas.getContext("2d");
     // Creates the platforms
     for (var i = 0; i < numPlatforms; i++) {
-        platforms[platforms.length] = new Platform(Math.floor(Math.random() * WIDTH), i * 500, Math.floor(Math.random() * 1000), (Math.random() <= 0.5) ? "left" : "right"); // testing platform + cool camera
+        platforms[platforms.length] = new Platform(Math.floor(Math.random() * WIDTH - LEFTSIDE.width * 2) + LEFTSIDE.width, i * 500, Math.floor(Math.random() * 1000), (Math.random() <= 0.5) ? "left" : "right"); // testing platform + cool camera
     }
     // Creates the player
     player = new Player(WIDTH / 2, HEIGHT - 50, 100, 100, LOG);
@@ -196,27 +196,18 @@ function update() {
             }
             player.onGround = true;
         }
-        else if (!player.onGround) {
-            if (player.ySpeed == 0) { // initial boost
-                player.ySpeed += 0.1;
-            }
-            if (player.ySpeed > 0) { // gravity
-                player.ySpeed *= GRAVITY;
-            }
-            if (player.ySpeed < 0) { // jump deceleration
-                player.ySpeed *= GRAVITY - (GRAVITY - 1);
-            }
-            if (player.ySpeed > -0.01 && player.ySpeed < 0) { // reset at low speeds
-                player.ySpeed = 0;
-            }
-            if (player.ySpeed > SPEED_CAP) { // speed cap (down)
-                player.ySpeed = SPEED_CAP;
-            }
-            if (player.ySpeed > -SPEED_CAP) { // speed cap (up)
-                player.ySpeed = -SPEED_CAP;
-            }
-        }
     });
+    if (!player.onGround) {
+        if (player.ySpeed != 0) { // gravity
+            player.ySpeed += GRAVITY;
+        }
+        if (player.ySpeed > SPEED_CAP) { // speed cap (down)
+            player.ySpeed = SPEED_CAP;
+        }
+        if (player.ySpeed < -SPEED_CAP) { // speed cap (up)
+            player.ySpeed = -SPEED_CAP;
+        }
+    }
     // Debugging
     //console.log(cameraHeight);
     //console.log(platforms);
