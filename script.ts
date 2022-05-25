@@ -1,6 +1,6 @@
 const WIDTH = 800;
 const HEIGHT = 800;
-const GRAVITY = 0.07;
+const GRAVITY = 0.1;
 const SPEED_CAP = 10;
 
 let ctx: CanvasRenderingContext2D;
@@ -19,6 +19,7 @@ let platformHeight = 100; // height of platforms
 let numPlatforms = 100;
 let platforms: Platform[];
 let player: Player;
+let collisionFlag: boolean; // used to check if player hits any platforms.
 
 let keysPressed = {
     left: false,
@@ -202,15 +203,20 @@ function update(){ // this loop runs 60 times per second
     ctx.drawImage(LEFTSIDE, 0, 0, 45, HEIGHT);
     ctx.drawImage(RIGHTSIDE, WIDTH - RIGHTSIDE.width, 0, 45, HEIGHT);
     // Gravity
+    collisionFlag = false;
     platforms.forEach(element => {
         if(player.x + player.width > element.x && player.x < element.x + element.width && player.y + player.height > element.y && player.y < element.y + element.height){
             console.log("collision with " + element);
+            collisionFlag = true;
             if(player.ySpeed > 0){
                 player.ySpeed = 0;
             }
-            player.onGround = true;
+            
         }
     });
+    if(!collisionFlag){
+        player.onGround = false;
+    }
     if (!player.onGround){
         if (player.ySpeed != 0){ // gravity
             player.ySpeed += GRAVITY;

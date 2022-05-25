@@ -1,6 +1,6 @@
 var WIDTH = 800;
 var HEIGHT = 800;
-var GRAVITY = 0.07;
+var GRAVITY = 0.1;
 var SPEED_CAP = 10;
 var ctx;
 var canvas;
@@ -198,6 +198,7 @@ function update() {
         }
     });
     if (!player.onGround) {
+        console.log("flying");
         if (player.ySpeed != 0) { // gravity
             player.ySpeed += GRAVITY;
         }
