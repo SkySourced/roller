@@ -177,7 +177,7 @@ function update() {
     ctx.fillStyle = "white";
     ctx.fillRect(0, 0, WIDTH, HEIGHT);
     // Increases camera height
-    if (CAMERA_SCROLL) {
+    if (gameState == "game") {
         cameraHeight += scrollSpeed;
     }
     // Draws the platforms
@@ -202,7 +202,7 @@ function update() {
     ctx.fillText("Score: " + score, WIDTH - SIDEBAR_WIDTH + 10, 50);
     // Game over
     if (cameraHeight - player.y > HEIGHT) {
-        CAMERA_SCROLL = false;
+        gameState = "end";
         ctx.fillStyle = "black";
         ctx.font = "60px Arial";
         ctx.fillText("Game Over", WIDTH / 2 - 200, HEIGHT / 2);
