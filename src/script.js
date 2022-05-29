@@ -70,7 +70,7 @@ var Player = /** @class */ (function () {
         console.log(cameraHeight - this.y, cameraHeight);
     };
     Player.prototype.jump = function () {
-        if (this.canJump && this.onGround && keysPressed.z) {
+        if (this.canJump && this.onGround) {
             console.log("jumping");
             this.ySpeed = -this.jumpHeight;
             this.onGround = false;
@@ -153,6 +153,9 @@ window.onload = function () {
                 player.dash();
                 player.canDash = false;
             }
+            else if (event.key == "r") {
+                location.reload();
+            }
         });
         document.addEventListener("keyup", function (event) {
             if (event.key == "ArrowLeft") {
@@ -177,7 +180,7 @@ function update() {
     ctx.fillStyle = "white";
     ctx.fillRect(0, 0, WIDTH, HEIGHT);
     // Increases camera height
-    if (gameState == "game") {
+    if (gameState = "game") {
         cameraHeight += scrollSpeed;
     }
     // Draws the platforms
@@ -199,7 +202,7 @@ function update() {
     // Score display
     ctx.fillStyle = "black";
     ctx.font = "30px Arial";
-    ctx.fillText("Score: " + score, WIDTH - SIDEBAR_WIDTH + 10, 50);
+    ctx.fillText("Score: " + score, SIDEBAR_WIDTH + 10, 50);
     // Game over
     if (cameraHeight - player.y > HEIGHT) {
         gameState = "end";
@@ -208,11 +211,6 @@ function update() {
         ctx.fillText("Game Over", WIDTH / 2 - 200, HEIGHT / 2);
         ctx.fillText("Final Score: " + score, WIDTH / 2 - 200, HEIGHT / 2 + 50);
         ctx.fillText("Press 'r' to restart", WIDTH / 2 - 200, HEIGHT / 2 + 100);
-        document.addEventListener("keydown", function (event) {
-            if (event.key == "r") {
-                location.reload();
-            }
-        });
     }
     // Gravity
     collisionFlag = false;

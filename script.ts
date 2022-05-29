@@ -141,6 +141,7 @@ window.onload = function(){
     platforms = [];
     canvas = <HTMLCanvasElement> document.getElementById("mainCanvas")
     ctx = canvas.getContext("2d");
+    
     window.addEventListener("keydown", function(event){
         if(event.key == "z" && gameState == "start"){
             gameState = "game";
@@ -168,6 +169,8 @@ window.onload = function(){
                 keysPressed.x = true;
                 player.dash()
                 player.canDash = false;
+            } else if(event.key == "r"){
+                location.reload();
             }
         })
         document.addEventListener("keyup", function(event){
@@ -212,7 +215,7 @@ function update(){ // this loop runs 60 times per second
     // Score display
     ctx.fillStyle = "black";
     ctx.font = "30px Arial";
-    ctx.fillText("Score: " + score, WIDTH - SIDEBAR_WIDTH + 10, 50);
+    ctx.fillText("Score: " + score, SIDEBAR_WIDTH + 10, 50);
     // Game over
     if(cameraHeight - player.y > HEIGHT){
         gameState = "end"
@@ -221,17 +224,12 @@ function update(){ // this loop runs 60 times per second
         ctx.fillText("Game Over", WIDTH/2 - 200, HEIGHT/2);
         ctx.fillText("Final Score: " + score, WIDTH/2 - 200, HEIGHT/2 + 50);
         ctx.fillText("Press 'r' to restart", WIDTH/2 - 200, HEIGHT/2 + 100);
-        document.addEventListener("keydown", function(event){
-            if(event.key == "r"){
-                location.reload();
-            }
-        })
     }
     // Gravity
     collisionFlag = false;
-    platforms.forEach(element => {
-        if(player.x + player.width > element.x && player.x < element.x + element.width && player.y + player.height > element.y && player.y < element.y + element.height){
-            console.log("collision with " + element);
+    platforms.forEach(platform => {
+        if(player.x + player.width > platform.x && player.x < platform.x + platform.width && player.y + player.height > platform.y && player.y < platform.y + platform.height){
+            console.log("collision with " + platform);
             collisionFlag = true;
             if(player.ySpeed > 0){
                 player.ySpeed = 0;
