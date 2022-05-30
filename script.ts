@@ -18,6 +18,8 @@ const RIGHTSIDE = new Image();
 RIGHTSIDE.src = "./assets/rightSide.png";
 const LOG = new Image();
 LOG.src = "./assets/log.png";
+const PLATFORM_TEXTURE = new Image();
+PLATFORM_TEXTURE.src = "./assets/platform.png";
 
 let scrollSpeed = 1; // speed the camera scrolls at
 let cameraHeight = 800; // height the camera starts at
@@ -39,22 +41,16 @@ class Platform {
     y: number;
     width: number;
     height: number;
-    side: "left" | "right";
-    constructor(x: number, y: number, width: number, side: "left" | "right"){
-        this.x = x;
+    side: "left" | "right" | "centre";
+    constructor(y: number, side: "left" | "right" | "centre"){
+        this.x = (side == "left") ? 0 : (side == "right") ? WIDTH - PLATFORM_TEXTURE.width : WIDTH / 2 - PLATFORM_TEXTURE.width / 2;
         this.y = y;
-        this.width = width;
+        this.width = PLATFORM_TEXTURE.width;
         this.height = platformHeight;
         this.side = side;
     }
     draw(ctx: CanvasRenderingContext2D){
-        if(this.side == "left"){
-            ctx.fillStyle = "red";
-            ctx.fillRect(0, cameraHeight - this.y, this.width, this.height) // drawing the platforms
-        } else if (this.side == "right"){
-            ctx.fillStyle = "blue";
-            ctx.fillRect(WIDTH - this.width, cameraHeight - this.y, this.width, this.height);
-        }
+        ctx.drawImage(PLATFORM_TEXTURE, this.x, this.y);
     }
 }
 
@@ -150,7 +146,8 @@ window.onload = function(){
     if(gameState == "game"){
         // Creates the platforms
         for(let i = 0; i < numPlatforms; i++){
-            platforms[platforms.length] = new Platform(Math.floor(Math.random() * WIDTH-SIDEBAR_WIDTH)+SIDEBAR_WIDTH, i * PLATFORM_DISTANCE, Math.floor(Math.random() * 1000), (Math.random() <= 0.5) ? "left" : "right") // testing platform + cool camera
+            let sideDeterminant = Math.random();
+            platforms[platforms.length] = new Platform(i * PLATFORM_DISTANCE, (sideDeterminant <= 0.33) ? "left" : (sideDeterminant <= 0.66) ? "right" : "centre") // testing platform + cool camera
         }
         // Creates the player
         player = new Player(WIDTH/2, HEIGHT-50, PLAYER_SIZE, PLAYER_SIZE, LOG);
@@ -229,7 +226,7 @@ function update(){ // this loop runs 60 times per second
     collisionFlag = false;
     platforms.forEach(platform => {
         if(player.x + player.width > platform.x && player.x < platform.x + platform.width && player.y + player.height > platform.y && player.y < platform.y + platform.height){
-            console.log("collision with " + platform);
+            console.log("collision with " + platform); 
             collisionFlag = true;
             if(player.ySpeed > 0){
                 player.ySpeed = 0;
