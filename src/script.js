@@ -8,13 +8,17 @@ var SIDEBAR_WIDTH = 45;
 var ctx;
 var canvas;
 var score = 0;
-var gameState = "game";
+var gameState = "start";
 var LEFTSIDE = new Image();
 LEFTSIDE.src = "./assets/leftSide.png";
 var RIGHTSIDE = new Image();
 RIGHTSIDE.src = "./assets/rightSide.png";
 var LOG = new Image();
 LOG.src = "./assets/log.png";
+var PLATFORM_TEXTURE = new Image();
+PLATFORM_TEXTURE.src = "./assets/platform.png";
+var SPLASH_SCREEN = new Image();
+SPLASH_SCREEN.src = "./assets/splash screen.png";
 var scrollSpeed = 1; // speed the camera scrolls at
 var cameraHeight = 800; // height the camera starts at
 var platformHeight = 100; // height of platforms
@@ -29,22 +33,15 @@ var keysPressed = {
     x: false
 };
 var Platform = /** @class */ (function () {
-    function Platform(x, y, width, side) {
-        this.x = x;
+    function Platform(y, side) {
+        this.x = (side == "left") ? 0 : (side == "right") ? WIDTH - PLATFORM_TEXTURE.width : WIDTH / 2 - PLATFORM_TEXTURE.width / 2;
         this.y = y;
-        this.width = width;
+        this.width = PLATFORM_TEXTURE.width;
         this.height = platformHeight;
         this.side = side;
     }
     Platform.prototype.draw = function (ctx) {
-        if (this.side == "left") {
-            ctx.fillStyle = "red";
-            ctx.fillRect(0, cameraHeight - this.y, this.width, this.height); // drawing the platforms
-        }
-        else if (this.side == "right") {
-            ctx.fillStyle = "blue";
-            ctx.fillRect(WIDTH - this.width, cameraHeight - this.y, this.width, this.height);
-        }
+        ctx.drawImage(PLATFORM_TEXTURE, this.x, this.y);
     };
     return Platform;
 }());
@@ -70,7 +67,7 @@ var Player = /** @class */ (function () {
         console.log(cameraHeight - this.y, cameraHeight);
     };
     Player.prototype.jump = function () {
-        if (this.canJump && this.onGround) {
+        if (this.canJump && this.onGround && keysPressed.z) {
             console.log("jumping");
             this.ySpeed = -this.jumpHeight;
             this.onGround = false;
@@ -122,6 +119,9 @@ window.onload = function () {
     platforms = [];
     canvas = document.getElementById("mainCanvas");
     ctx = canvas.getContext("2d");
+    if (gameState == "start") {
+        ctx.drawImage(SPLASH_SCREEN, 0, 0);
+    }
     window.addEventListener("keydown", function (event) {
         if (event.key == "z" && gameState == "start") {
             gameState = "game";
@@ -130,7 +130,8 @@ window.onload = function () {
     if (gameState == "game") {
         // Creates the platforms
         for (var i = 0; i < numPlatforms; i++) {
-            platforms[platforms.length] = new Platform(Math.floor(Math.random() * WIDTH - SIDEBAR_WIDTH) + SIDEBAR_WIDTH, i * PLATFORM_DISTANCE, Math.floor(Math.random() * 1000), (Math.random() <= 0.5) ? "left" : "right"); // testing platform + cool camera
+            var sideDeterminant = Math.random();
+            platforms[platforms.length] = new Platform(i * PLATFORM_DISTANCE, (sideDeterminant <= 0.33) ? "left" : (sideDeterminant <= 0.66) ? "right" : "centre"); // testing platform + cool camera
         }
         // Creates the player
         player = new Player(WIDTH / 2, HEIGHT - 50, PLAYER_SIZE, PLAYER_SIZE, LOG);
@@ -180,7 +181,7 @@ function update() {
     ctx.fillStyle = "white";
     ctx.fillRect(0, 0, WIDTH, HEIGHT);
     // Increases camera height
-    if (gameState = "game") {
+    if (gameState == "game") {
         cameraHeight += scrollSpeed;
     }
     // Draws the platforms
@@ -214,9 +215,9 @@ function update() {
     }
     // Gravity
     collisionFlag = false;
-    platforms.forEach(function (element) {
-        if (player.x + player.width > element.x && player.x < element.x + element.width && player.y + player.height > element.y && player.y < element.y + element.height) {
-            console.log("collision with " + element);
+    platforms.forEach(function (platform) {
+        if (player.x + player.width > platform.x && player.x < platform.x + platform.width && player.y + player.height > platform.y && player.y < platform.y + platform.height) {
+            console.log("collision with " + platform);
             collisionFlag = true;
             if (player.ySpeed > 0) {
                 player.ySpeed = 0;

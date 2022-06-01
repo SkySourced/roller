@@ -10,7 +10,7 @@ let ctx: CanvasRenderingContext2D;
 let canvas: HTMLCanvasElement;
 let score: number = 0;
 
-let gameState: "start" | "game" | "end" = "game";
+let gameState: "start" | "game" | "end" = "start";
 
 const LEFTSIDE = new Image();
 LEFTSIDE.src = "./assets/leftSide.png";
@@ -20,6 +20,8 @@ const LOG = new Image();
 LOG.src = "./assets/log.png";
 const PLATFORM_TEXTURE = new Image();
 PLATFORM_TEXTURE.src = "./assets/platform.png";
+const SPLASH_SCREEN = new Image();
+SPLASH_SCREEN.src = "./assets/splash screen.png";
 
 let scrollSpeed = 1; // speed the camera scrolls at
 let cameraHeight = 800; // height the camera starts at
@@ -137,7 +139,9 @@ window.onload = function(){
     platforms = [];
     canvas = <HTMLCanvasElement> document.getElementById("mainCanvas")
     ctx = canvas.getContext("2d");
-    
+    if(gameState == "start"){
+        ctx.drawImage(SPLASH_SCREEN, 0, 0);
+    }
     window.addEventListener("keydown", function(event){
         if(event.key == "z" && gameState == "start"){
             gameState = "game";
@@ -190,7 +194,7 @@ function update(){ // this loop runs 60 times per second
     ctx.fillStyle = "white";
     ctx.fillRect(0, 0, WIDTH, HEIGHT);
     // Increases camera height
-    if(gameState = "game"){
+    if(gameState == "game"){
         cameraHeight += scrollSpeed;
     }
     // Draws the platforms
