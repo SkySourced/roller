@@ -1,0 +1,2 @@
+package-lock.json // node packages (only relevant on personal computers)
+tsconfig.json // typescript compiler settings (only usable on personal computers)
