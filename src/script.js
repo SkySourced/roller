@@ -1,52 +1,52 @@
-var WIDTH = 800;
-var HEIGHT = 800;
-var GRAVITY = 0.1;
-var SPEED_CAP = 10;
-var PLAYER_SIZE = 100;
-var PLATFORM_DISTANCE = 500;
-var SIDEBAR_WIDTH = 45;
-var ctx;
-var canvas;
-var score = 0;
-var gameState = "start";
-var LEFTSIDE = new Image();
+"use strict";
+const WIDTH = 800;
+const HEIGHT = 800;
+const GRAVITY = 0.1;
+const SPEED_CAP = 10;
+const PLAYER_SIZE = 100;
+const PLATFORM_DISTANCE = 500;
+const SIDEBAR_WIDTH = 45;
+let ctx;
+let canvas;
+let score = 0;
+let gameState = "start";
+const LEFTSIDE = new Image();
 LEFTSIDE.src = "./assets/leftSide.png";
-var RIGHTSIDE = new Image();
+const RIGHTSIDE = new Image();
 RIGHTSIDE.src = "./assets/rightSide.png";
-var LOG = new Image();
+const LOG = new Image();
 LOG.src = "./assets/log.png";
-var PLATFORM_TEXTURE = new Image();
+const PLATFORM_TEXTURE = new Image();
 PLATFORM_TEXTURE.src = "./assets/platform.png";
-var SPLASH_SCREEN = new Image();
+const SPLASH_SCREEN = new Image();
 SPLASH_SCREEN.src = "./assets/splash screen.png";
-var scrollSpeed = 1; // speed the camera scrolls at
-var cameraHeight = 800; // height the camera starts at
-var platformHeight = 100; // height of platforms
-var numPlatforms = 100;
-var platforms;
-var player;
-var collisionFlag; // used to check if player hits any platforms.
-var keysPressed = {
+let scrollSpeed = 1; // speed the camera scrolls at
+let cameraHeight = 800; // height the camera starts at
+let platformHeight = 100; // height of platforms
+let numPlatforms = 100;
+let platforms;
+let player;
+let collisionFlag; // used to check if player hits any platforms.
+let keysPressed = {
     left: false,
     right: false,
     z: false,
     x: false
 };
-var Platform = /** @class */ (function () {
-    function Platform(y, side) {
+class Platform {
+    constructor(y, side) {
         this.x = (side == "left") ? 0 : (side == "right") ? WIDTH - PLATFORM_TEXTURE.width : WIDTH / 2 - PLATFORM_TEXTURE.width / 2;
         this.y = y;
         this.width = PLATFORM_TEXTURE.width;
         this.height = platformHeight;
         this.side = side;
     }
-    Platform.prototype.draw = function (ctx) {
+    draw(ctx) {
         ctx.drawImage(PLATFORM_TEXTURE, this.x, this.y);
-    };
-    return Platform;
-}());
-var Player = /** @class */ (function () {
-    function Player(x, y, width, height, image) {
+    }
+}
+class Player {
+    constructor(x, y, width, height, image) {
         this.x = x;
         this.y = y;
         this.width = width;
@@ -62,18 +62,18 @@ var Player = /** @class */ (function () {
         this.canDash = false;
         this.canJump = false;
     }
-    Player.prototype.draw = function (ctx) {
+    draw(ctx) {
         ctx.drawImage(this.image, this.x, cameraHeight - this.y, this.width, this.height);
         console.log(cameraHeight - this.y, cameraHeight);
-    };
-    Player.prototype.jump = function () {
+    }
+    jump() {
         if (this.canJump && this.onGround && keysPressed.z) {
             console.log("jumping");
             this.ySpeed = -this.jumpHeight;
             this.onGround = false;
         }
-    };
-    Player.prototype.dash = function () {
+    }
+    dash() {
         if (this.canDash && !this.dashing) {
             console.log("dashing");
             this.dashing = true;
@@ -91,8 +91,8 @@ var Player = /** @class */ (function () {
             }
             this.dashing = false;
         }
-    };
-    Player.prototype.move = function () {
+    }
+    move() {
         if (!this.dashing) {
             this.y -= this.ySpeed;
             if (keysPressed.left) {
@@ -112,9 +112,8 @@ var Player = /** @class */ (function () {
         if (this.x > WIDTH - this.width - SIDEBAR_WIDTH) {
             this.x = WIDTH - this.width - SIDEBAR_WIDTH;
         }
-    };
-    return Player;
-}());
+    }
+}
 window.onload = function () {
     platforms = [];
     canvas = document.getElementById("mainCanvas");
@@ -129,8 +128,8 @@ window.onload = function () {
     });
     if (gameState == "game") {
         // Creates the platforms
-        for (var i = 0; i < numPlatforms; i++) {
-            var sideDeterminant = Math.random();
+        for (let i = 0; i < numPlatforms; i++) {
+            let sideDeterminant = Math.random();
             platforms[platforms.length] = new Platform(i * PLATFORM_DISTANCE, (sideDeterminant <= 0.33) ? "left" : (sideDeterminant <= 0.66) ? "right" : "centre"); // testing platform + cool camera
         }
         // Creates the player
@@ -185,7 +184,7 @@ function update() {
         cameraHeight += scrollSpeed;
     }
     // Draws the platforms
-    for (var i = 0; i < platforms.length; i++) {
+    for (let i = 0; i < platforms.length; i++) {
         platforms[i].draw(ctx);
     }
     // Draws the player
@@ -215,7 +214,7 @@ function update() {
     }
     // Gravity
     collisionFlag = false;
-    platforms.forEach(function (platform) {
+    platforms.forEach(platform => {
         if (player.x + player.width > platform.x && player.x < platform.x + platform.width && player.y + player.height > platform.y && player.y < platform.y + platform.height) {
             console.log("collision with " + platform);
             collisionFlag = true;

@@ -87,7 +87,7 @@ class Player {
         this.canDash = false;
         this.canJump = false;
     }
-    draw(ctx: CanvasRenderingContext2D){
+    draw(ctx: CanvasRenderingContext2D){ // draw player
         ctx.drawImage(this.image, this.x, cameraHeight - this.y, this.width, this.height);
         console.log(cameraHeight - this.y, cameraHeight)
     }
@@ -103,20 +103,20 @@ class Player {
             console.log("dashing");
             this.dashing = true;
             if(this.facing == "right"&& this.x + this.dashLength < WIDTH - SIDEBAR_WIDTH){
-                this.x += this.dashLength;
+                this.x += this.dashLength; //regular right dash
             } else if (this.facing == "left" && this.x - this.dashLength > SIDEBAR_WIDTH) {
-                this.x -= this.dashLength;
+                this.x -= this.dashLength; //regular left dash
             } else if (this.facing == "right" && this.x + this.dashLength > WIDTH - SIDEBAR_WIDTH){
-                this.x == WIDTH - SIDEBAR_WIDTH;
+                this.x == WIDTH - SIDEBAR_WIDTH; // right dash off screen
             } else if (this.facing == "left" && this.x - this.dashLength < SIDEBAR_WIDTH) {
-                this.x == SIDEBAR_WIDTH;
+                this.x == SIDEBAR_WIDTH; // left dash off screen
             }
             this.dashing = false; 
         }
     }
     move(){
         if(!this.dashing){
-            this.y -= this.ySpeed;
+            this.y -= this.ySpeed; // might not be neccessary
             if(keysPressed.left){
                 console.log("moving left");
                 this.facing = "left";
@@ -127,7 +127,7 @@ class Player {
                 this.x += this.moveSpeed;
             }
         }
-        if(this.x < SIDEBAR_WIDTH){
+        if(this.x < SIDEBAR_WIDTH){ // keep player from going off screen
             this.x = SIDEBAR_WIDTH;
         }
         if(this.x > WIDTH - this.width - SIDEBAR_WIDTH){
@@ -135,7 +135,7 @@ class Player {
         }
     }
 }
-window.onload = function(){
+window.onload = function(){ // start function
     platforms = [];
     canvas = <HTMLCanvasElement> document.getElementById("mainCanvas")
     ctx = canvas.getContext("2d");
