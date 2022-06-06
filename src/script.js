@@ -42,7 +42,8 @@ class Platform {
         this.side = side;
     }
     draw(ctx) {
-        ctx.drawImage(PLATFORM_TEXTURE, this.x, this.y);
+        ctx.fillStyle = "black";
+        ctx.fillRect(this.x, this.y, this.width, this.height);
     }
 }
 class Player {
@@ -78,23 +79,23 @@ class Player {
             console.log("dashing");
             this.dashing = true;
             if (this.facing == "right" && this.x + this.dashLength < WIDTH - SIDEBAR_WIDTH) {
-                this.x += this.dashLength;
+                this.x += this.dashLength; //regular right dash
             }
             else if (this.facing == "left" && this.x - this.dashLength > SIDEBAR_WIDTH) {
-                this.x -= this.dashLength;
+                this.x -= this.dashLength; //regular left dash
             }
             else if (this.facing == "right" && this.x + this.dashLength > WIDTH - SIDEBAR_WIDTH) {
-                this.x == WIDTH - SIDEBAR_WIDTH;
+                this.x == WIDTH - SIDEBAR_WIDTH; // right dash off screen
             }
             else if (this.facing == "left" && this.x - this.dashLength < SIDEBAR_WIDTH) {
-                this.x == SIDEBAR_WIDTH;
+                this.x == SIDEBAR_WIDTH; // left dash off screen
             }
             this.dashing = false;
         }
     }
     move() {
         if (!this.dashing) {
-            this.y -= this.ySpeed;
+            this.y -= this.ySpeed; // might not be neccessary
             if (keysPressed.left) {
                 console.log("moving left");
                 this.facing = "left";
@@ -106,7 +107,7 @@ class Player {
                 this.x += this.moveSpeed;
             }
         }
-        if (this.x < SIDEBAR_WIDTH) {
+        if (this.x < SIDEBAR_WIDTH) { // keep player from going off screen
             this.x = SIDEBAR_WIDTH;
         }
         if (this.x > WIDTH - this.width - SIDEBAR_WIDTH) {
@@ -124,8 +125,11 @@ window.onload = function () {
     window.addEventListener("keydown", function (event) {
         if (event.key == "z" && gameState == "start") {
             gameState = "game";
+            gameSetup();
         }
     });
+};
+function gameSetup() {
     if (gameState == "game") {
         // Creates the platforms
         for (let i = 0; i < numPlatforms; i++) {
@@ -174,7 +178,7 @@ window.onload = function () {
             }
         });
     }
-};
+}
 function update() {
     // Clears the canvas
     ctx.fillStyle = "white";
