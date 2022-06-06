@@ -52,7 +52,8 @@ class Platform {
         this.side = side;
     }
     draw(ctx: CanvasRenderingContext2D){
-        ctx.drawImage(PLATFORM_TEXTURE, this.x, this.y);
+        ctx.fillStyle = "black";
+        ctx.fillRect(this.x, this.y, this.width, this.height);
     }
 }
 
@@ -145,8 +146,11 @@ window.onload = function(){ // start function
     window.addEventListener("keydown", function(event){
         if(event.key == "z" && gameState == "start"){
             gameState = "game";
+            gameSetup();
         }
     })
+}
+function gameSetup(){
     if(gameState == "game"){
         // Creates the platforms
         for(let i = 0; i < numPlatforms; i++){
