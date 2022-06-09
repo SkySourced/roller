@@ -53,7 +53,7 @@ class Platform {
     }
     draw(ctx: CanvasRenderingContext2D){
         ctx.fillStyle = "black";
-        ctx.fillRect(this.x, this.y, this.width, this.height);
+        ctx.drawImage(PLATFORM_TEXTURE, this.x, cameraHeight - this.y);
     }
 }
 
@@ -162,20 +162,20 @@ function gameSetup(){
         // Creates the game loop
         setInterval(update, 1000/60); // 60 fps
         document.addEventListener("keydown", function(event){
-            if(event.key == "ArrowLeft"){
-                keysPressed.left = true;
-            } else if (event.key == "ArrowRight"){
-                keysPressed.right = true;
-            } else if (event.key == "z"){
-                keysPressed.z = true;
-                player.jump();
-                player.canJump = false;
-            } else if (event.key == "x" || event.key == "c"){
-                keysPressed.x = true;
-                player.dash()
-                player.canDash = false;
-            } else if(event.key == "r"){
-                location.reload();
+            if(gameState=="game"){
+                if(event.key == "ArrowLeft"){
+                    keysPressed.left = true;
+                } else if (event.key == "ArrowRight"){
+                    keysPressed.right = true;
+                } else if (event.key == "z"){
+                    keysPressed.z = true;
+                    player.jump();
+                    player.canJump = false;
+                } else if (event.key == "x" || event.key == "c"){
+                    keysPressed.x = true;
+                    player.dash()
+                    player.canDash = false;
+                }
             }
         })
         document.addEventListener("keyup", function(event){
@@ -222,15 +222,20 @@ function update(){ // this loop runs 60 times per second
     ctx.font = "30px Arial";
     ctx.fillText("Score: " + score, SIDEBAR_WIDTH + 10, 50);
     // Game over
-    if(cameraHeight - player.y > HEIGHT){
+    if(cameraHeight - player.y + player.height > HEIGHT){
         gameState = "end"
         ctx.fillStyle = "black";
         ctx.font = "60px Arial";
         ctx.fillText("Game Over", WIDTH/2 - 200, HEIGHT/2);
         ctx.fillText("Final Score: " + score, WIDTH/2 - 200, HEIGHT/2 + 50);
         ctx.fillText("Press 'r' to restart", WIDTH/2 - 200, HEIGHT/2 + 100);
+        document.addEventListener('keydown', function(event){
+            if(event.key == "r"){
+                location.reload();
+            }
+        })
     }
-    // Gravity
+    // Gravity 
     collisionFlag = false;
     platforms.forEach(platform => {
         if(player.x + player.width>platform.x && player.x < platform.x + platform.width){
@@ -239,18 +244,22 @@ function update(){ // this loop runs 60 times per second
         if(player.y + player.height > platform.y && player.y < platform.y + platform.height){
             console.log("y collision");
         }
-        if(player.x + player.width > platform.x && player.x < platform.x + platform.width && player.y + player.height > platform.y && player.y < platform.y + platform.height){
+        if(player.x + player.width >= platform.x && 
+           player.x <= platform.x + platform.width && 
+           player.y + player.height > platform.y && 
+           player.y < platform.y + platform.height){
             console.log("collision with " + platform); 
-            collisionFlag = true;
+            //collisionFlag = true;
+            player.onGround = true;
             if(player.ySpeed > 0){
                 player.ySpeed = 0;
             }
             
         }
     });
-    if(!collisionFlag){
-        player.onGround = false;
-    }
+    //if(!collisionFlag){
+    //    player.onGround = false;
+    //}
     if (!player.onGround){
         if (player.ySpeed != 0){ // gravity
             player.ySpeed += GRAVITY;
