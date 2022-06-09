@@ -233,6 +233,12 @@ function update(){ // this loop runs 60 times per second
     // Gravity
     collisionFlag = false;
     platforms.forEach(platform => {
+        if(player.x + player.width>platform.x && player.x < platform.x + platform.width){
+            console.log("x collision");
+        }
+        if(player.y + player.height > platform.y && player.y < platform.y + platform.height){
+            console.log("y collision");
+        }
         if(player.x + player.width > platform.x && player.x < platform.x + platform.width && player.y + player.height > platform.y && player.y < platform.y + platform.height){
             console.log("collision with " + platform); 
             collisionFlag = true;
