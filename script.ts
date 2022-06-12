@@ -238,11 +238,9 @@ function update(){ // this loop runs 60 times per second
     // Gravity 
     collisionFlag = false;
     platforms.forEach(platform => {
-        if(player.x + player.width>platform.x && player.x < platform.x + platform.width){
-            console.log("x collision");
-        }
-        if(player.y + player.height > platform.y && player.y < platform.y + platform.height){
-            console.log("y collision");
+        if(player.x + player.width > platform.x && player.x < platform.x + platform.width && player.y > platform.y){
+            console.log("above platform with ", platform.x, platform.width, player.x, player.width);
+            
         }
         if(player.x + player.width >= platform.x && 
            player.x <= platform.x + platform.width && 
@@ -254,7 +252,12 @@ function update(){ // this loop runs 60 times per second
             if(player.ySpeed > 0){
                 player.ySpeed = 0;
             }
-            
+            if(player.y > platform.y){
+                console.log("collision from above");
+            } else {
+                console.log("collision from below");
+                player.y -= player.ySpeed;
+            }
         }
     });
     //if(!collisionFlag){
