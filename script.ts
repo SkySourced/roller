@@ -1,3 +1,7 @@
+// *********
+// CONSTANTS
+// *********
+
 const WIDTH = 800;
 const HEIGHT = 800;
 const GRAVITY = 0.1;
@@ -6,11 +10,9 @@ const PLAYER_SIZE = 100;
 const PLATFORM_DISTANCE = 500;
 const SIDEBAR_WIDTH = 45; 
 
-let ctx: CanvasRenderingContext2D;
-let canvas: HTMLCanvasElement;
-let score: number = 0;
-
-let gameState: "start" | "game" | "end" = "start";
+// *********
+// IMAGES
+// *********
 
 const LEFTSIDE = new Image();
 LEFTSIDE.src = "./assets/leftSide.png";
@@ -23,6 +25,14 @@ PLATFORM_TEXTURE.src = "./assets/platform.png";
 const SPLASH_SCREEN = new Image();
 SPLASH_SCREEN.src = "./assets/splash screen.png";
 
+// *********
+// VARIABLES
+// *********
+
+let ctx: CanvasRenderingContext2D;
+let canvas: HTMLCanvasElement;
+let score: number = 0;
+let gameState: "start" | "game" | "end" = "start";
 let scrollSpeed = 1; // speed the camera scrolls at
 let cameraHeight = 800; // height the camera starts at
 let platformHeight = 100; // height of platforms
@@ -30,13 +40,18 @@ let numPlatforms = 100;
 let platforms: Platform[];
 let player: Player;
 let collisionFlag: boolean; // used to check if player hits any platforms.
-
+let speedChangeFrameCount: number; // used to gradually increase the speed when required
+let speedChanging: boolean = false;
 let keysPressed = {
     left: false,
     right: false,
     z: false,
     x: false
 }
+
+// *********
+// CLASSES
+// *********
 
 class Platform {
     x: number;
@@ -79,7 +94,7 @@ class Player {
         this.height = height;
         this.image = image;
         this.moveSpeed = 10;
-        this.jumpHeight = 70;
+        this.jumpHeight = 65;
         this.dashLength = 170;
         this.facing = "right";
         this.dashing = false;
@@ -143,12 +158,8 @@ window.onload = function(){ // start function
     if(gameState == "start"){
         ctx.drawImage(SPLASH_SCREEN, 0, 0);
     }
-    window.addEventListener("keydown", function(event){
-        if(event.key == "z" && gameState == "start"){
-            gameState = "game";
-            gameSetup();
-        }
-    })
+    window.addEventListener("keydown", keyDownHandler);
+    window.addEventListener("keyup", keyUpHandler);
 }
 function gameSetup(){
     if(gameState == "game"){
@@ -161,36 +172,6 @@ function gameSetup(){
         player = new Player(WIDTH/2, HEIGHT-50, PLAYER_SIZE, PLAYER_SIZE, LOG);
         // Creates the game loop
         setInterval(update, 1000/60); // 60 fps
-        document.addEventListener("keydown", function(event){
-            if(gameState=="game"){
-                if(event.key == "ArrowLeft"){
-                    keysPressed.left = true;
-                } else if (event.key == "ArrowRight"){
-                    keysPressed.right = true;
-                } else if (event.key == "z"){
-                    keysPressed.z = true;
-                    player.jump();
-                    player.canJump = false;
-                } else if (event.key == "x" || event.key == "c"){
-                    keysPressed.x = true;
-                    player.dash()
-                    player.canDash = false;
-                }
-            }
-        })
-        document.addEventListener("keyup", function(event){
-            if(event.key == "ArrowLeft"){
-                keysPressed.left = false;
-            } else if (event.key == "ArrowRight"){
-                keysPressed.right = false;
-            } else if (event.key == "z"){
-                keysPressed.z = false;
-                player.canJump = true;
-            } else if (event.key == "x" || event.key == "c"){
-                keysPressed.x = false;
-                player.canDash = true;
-            }
-        })
     }
 }
 function update(){ // this loop runs 60 times per second
@@ -216,6 +197,22 @@ function update(){ // this loop runs 60 times per second
     // Score calculation
     if(Math.floor(player.y / PLATFORM_DISTANCE) > score){
         score = Math.floor(player.y / PLATFORM_DISTANCE);
+        // Attempting to increase scroll speed
+        if(score % 5 == 0){
+            speedChanging = true;
+            speedChangeFrameCount = 0;
+        }
+    }
+    if(speedChanging){
+        if(Math.floor(speedChangeFrameCount / 10) % 2 == 0){ // every other 10 frames
+            ctx.fillStyle = "lime";
+            ctx.font = "30px Arial";
+            ctx.fillText("Speed Up!", WIDTH/2 - 100, HEIGHT/2);
+        }
+        speedChangeFrameCount++;
+        if(speedChangeFrameCount >= 100){
+            speedChanging = false;
+        }
     }
     // Score display
     ctx.fillStyle = "black";
@@ -229,21 +226,13 @@ function update(){ // this loop runs 60 times per second
         ctx.fillText("Game Over", WIDTH/2 - 200, HEIGHT/2);
         ctx.fillText("Final Score: " + score, WIDTH/2 - 200, HEIGHT/2 + 50);
         ctx.fillText("Press 'r' to restart", WIDTH/2 - 200, HEIGHT/2 + 100);
-        document.addEventListener('keydown', function(event){
-            if(event.key == "r"){
-                location.reload();
-            }
-        })
     }
     // Gravity 
     collisionFlag = false;
     platforms.forEach(platform => {
-        if(player.x + player.width >= platform.x && 
-            player.x <= platform.x + platform.width && 
-            player.y + player.height > platform.y && 
-            player.y < platform.y + platform.height){
+        if(player.x + player.width >= platform.x && player.x <= platform.x + platform.width && player.y + player.height > platform.y && player.y < platform.y + platform.height){
             collisionFlag = true;
-            if(player.ySpeed > 0){
+            if(player.ySpeed > 0){ // stop player from falling through platforms
                 player.ySpeed = 0;
             }
             if(player.y > platform.y){ // collision from above
@@ -252,9 +241,11 @@ function update(){ // this loop runs 60 times per second
                 player.ySpeed = 0.1;
             }
             if(platform.x + platform.width < player.x){ // collision from right
+                console.log("right");
                 player.x = platform.x + platform.width;
             }
             if(platform.x > player.x + player.width){ // collision from left
+                console.log("left");
                 player.x = platform.x - player.width;
             }
         }
@@ -277,4 +268,44 @@ function update(){ // this loop runs 60 times per second
     //console.log(cameraHeight);
     //console.log(platforms);
     console.log(player.ySpeed)
+}
+// Keyboard input
+function keyDownHandler(event: KeyboardEvent){
+    let key = event.key;
+    if(event.key == "z" && gameState == "start"){
+        gameState = "game";
+        gameSetup();
+    }
+    if(event.key == "r"){
+        location.reload();
+    }
+    if(gameState=="game"){
+        if(event.key == "ArrowLeft"){
+            keysPressed.left = true;
+        } else if (event.key == "ArrowRight"){
+            keysPressed.right = true;
+        } else if (event.key == "z"){
+            keysPressed.z = true;
+            player.jump();
+            player.canJump = false;
+        } else if (event.key == "x" || event.key == "c"){
+            keysPressed.x = true;
+            player.dash()
+            player.canDash = false;
+        }
+    }
+}
+function keyUpHandler(event: KeyboardEvent){
+    let key = event.key;
+    if(event.key == "ArrowLeft"){
+        keysPressed.left = false;
+    } else if (event.key == "ArrowRight"){
+        keysPressed.right = false;
+    } else if (event.key == "z"){
+        keysPressed.z = false;
+        player.canJump = true;
+    } else if (event.key == "x" || event.key == "c"){
+        keysPressed.x = false;
+        player.canDash = true;
+    }
 }
