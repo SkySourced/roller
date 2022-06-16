@@ -9,6 +9,7 @@ const SPEED_CAP = 10;
 const PLAYER_SIZE = 100;
 const PLATFORM_DISTANCE = 500;
 const SIDEBAR_WIDTH = 45; 
+const SPEED_INCREASE = 0.4;
 
 // *********
 // IMAGES
@@ -209,15 +210,19 @@ function update(){ // this loop runs 60 times per second
             ctx.font = "30px Arial";
             ctx.fillText("Speed Up!", WIDTH/2 - 100, HEIGHT/2);
         }
+        scrollSpeed += SPEED_INCREASE/100;
         speedChangeFrameCount++;
         if(speedChangeFrameCount >= 100){
             speedChanging = false;
         }
+
     }
     // Score display
     ctx.fillStyle = "black";
     ctx.font = "30px Arial";
     ctx.fillText("Score: " + score, SIDEBAR_WIDTH + 10, 50);
+    // Level display
+    ctx.fillText("Level: " + Math.floor(score / 5), SIDEBAR_WIDTH + 10, 100);
     // Game over
     if(cameraHeight - player.y + player.height > HEIGHT){
         gameState = "end"

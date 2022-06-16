@@ -8,6 +8,7 @@ var SPEED_CAP = 10;
 var PLAYER_SIZE = 100;
 var PLATFORM_DISTANCE = 500;
 var SIDEBAR_WIDTH = 45;
+var SPEED_INCREASE = 0.4;
 // *********
 // IMAGES
 // *********
@@ -188,6 +189,7 @@ function update() {
             ctx.font = "30px Arial";
             ctx.fillText("Speed Up!", WIDTH / 2 - 100, HEIGHT / 2);
         }
+        scrollSpeed += SPEED_INCREASE / 100;
         speedChangeFrameCount++;
         if (speedChangeFrameCount >= 100) {
             speedChanging = false;
