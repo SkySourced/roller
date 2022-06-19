@@ -6,9 +6,10 @@ var HEIGHT = 800;
 var GRAVITY = 0.1;
 var SPEED_CAP = 10;
 var PLAYER_SIZE = 100;
-var PLATFORM_DISTANCE = 500;
+var PLATFORM_SPACING_DIST = 500;
 var SIDEBAR_WIDTH = 45;
 var SPEED_INCREASE = 0.4;
+var SPEED_INCREASE_LENGTH = 100;
 // *********
 // IMAGES
 // *********
@@ -146,7 +147,7 @@ function gameSetup() {
         // Creates the platforms
         for (var i = 0; i < numPlatforms; i++) {
             var sideDeterminant = Math.random();
-            platforms[platforms.length] = new Platform(i * PLATFORM_DISTANCE, (sideDeterminant <= 0.33) ? "left" : (sideDeterminant <= 0.66) ? "right" : "centre"); // testing platform + cool camera
+            platforms[platforms.length] = new Platform(i * PLATFORM_SPACING_DIST, (sideDeterminant <= 0.33) ? "left" : (sideDeterminant <= 0.66) ? "right" : "centre");
         }
         // Creates the player
         player = new Player(WIDTH / 2, HEIGHT - 50, PLAYER_SIZE, PLAYER_SIZE, LOG);
@@ -175,8 +176,8 @@ function update() {
     ctx.drawImage(LEFTSIDE, 0, 0, SIDEBAR_WIDTH, HEIGHT);
     ctx.drawImage(RIGHTSIDE, WIDTH - SIDEBAR_WIDTH, 0, SIDEBAR_WIDTH, HEIGHT);
     // Score calculation
-    if (Math.floor(player.y / PLATFORM_DISTANCE) > score) {
-        score = Math.floor(player.y / PLATFORM_DISTANCE);
+    if (Math.floor(player.y / PLATFORM_SPACING_DIST) > score) {
+        score = Math.floor(player.y / PLATFORM_SPACING_DIST);
         // Attempting to increase scroll speed
         if (score % 5 == 0) {
             speedChanging = true;
@@ -189,16 +190,23 @@ function update() {
             ctx.font = "30px Arial";
             ctx.fillText("Speed Up!", WIDTH / 2 - 100, HEIGHT / 2);
         }
-        scrollSpeed += SPEED_INCREASE / 100;
+        scrollSpeed += SPEED_INCREASE / SPEED_INCREASE_LENGTH;
         speedChangeFrameCount++;
-        if (speedChangeFrameCount >= 100) {
+        if (speedChangeFrameCount >= SPEED_INCREASE_LENGTH) {
             speedChanging = false;
         }
     }
     // Score display
-    ctx.fillStyle = "black";
+    ctx.fillStyle = (player.x <= 200 && player.y <= 150) ? "rgba(171, 171, 171, 0.4)" : "rgba(171, 171, 171, 1.0)";
+    ctx.strokeStyle = (player.x <= 200 && player.y <= 150) ? "rgba(0, 0, 0, 0.4)" : "rgba(0, 0, 0, 1.0)";
+    ctx.fillRect(SIDEBAR_WIDTH, 0, 200 - SIDEBAR_WIDTH, 150);
+    ctx.strokeRect(SIDEBAR_WIDTH, 0, 200 - SIDEBAR_WIDTH, 150);
+    // Score display
+    ctx.fillStyle = (player.x <= 200 && player.y <= 150) ? "rgba(0, 0, 0, 0.4)" : "rgba(0, 0, 0, 1.0)";
     ctx.font = "30px Arial";
-    ctx.fillText("Score: " + score, SIDEBAR_WIDTH + 10, 50);
+    ctx.fillText("Score: " + score, SIDEBAR_WIDTH + 20, 50);
+    // Level display
+    ctx.fillText("Level: " + Math.ceil(score / 5), SIDEBAR_WIDTH + 20, 100);
     // Game over
     if (cameraHeight - player.y + player.height > HEIGHT) {
         gameState = "end";
