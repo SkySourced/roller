@@ -39,6 +39,7 @@ var player;
 var collisionFlag; // used to check if player hits any platforms.
 var speedChangeFrameCount; // used to gradually increase the speed when required
 var speedChanging = false;
+var lastFrameCollision = false;
 var keysPressed = {
     left: false,
     right: false,
@@ -232,10 +233,15 @@ function update() {
             console.log("Platform width: " + platform.width);
         }
     });
-    if (!collisionFlag) { // sets player as off the ground if not colliding with anything
-        player.onGround = false;
+    if (collisionFlag) {
+        lastFrameCollision = true;
     }
-    if (!player.onGround) {
+    if (!collisionFlag) { // sets player as off the ground if not colliding with anything
+        if (lastFrameCollision) {
+            player.ySpeed += GRAVITY;
+            lastFrameCollision = false;
+        }
+        player.onGround = false;
         if (player.ySpeed != 0) { // gravity
             player.ySpeed += GRAVITY;
         }
@@ -246,10 +252,12 @@ function update() {
             player.ySpeed = -SPEED_CAP;
         }
     }
+    //if (!player.onGround){
+    //}
     // Debugging
     //console.log(cameraHeight);
     //console.log(platforms);
-    console.log(player.ySpeed);
+    //console.log(player.ySpeed)
 }
 // Keyboard input
 function keyDownHandler(event) {
