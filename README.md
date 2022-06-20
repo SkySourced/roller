@@ -7,9 +7,12 @@ A log (circle) rolls up a sawmill and jumping and dashing over them. You can bou
 ## Photo credits
 Brick texture by M0tty
 https://commons.wikimedia.org/wiki/File:Red_brick_wall_texture.JPG
+
 Buzzsaw by Grafner
+
 **In splash screen**
 Buzzsaw's eyes by Erin Silversmith
 https://commons.wikimedia.org/wiki/File:Eyes_lumen_design_studio_01.svg
+
 Log's eyes by Kasuga
 https://commons.wikimedia.org/wiki/File:Bright_anime_eyes.svg

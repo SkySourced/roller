@@ -219,12 +219,7 @@ function update(){ // this loop runs 60 times per second
 
     }
     // Score display
-    ctx.fillStyle = (player.x <= 200 && player.y <= 150) ? "rgba(171, 171, 171, 0.4)" : "rgba(171, 171, 171, 1.0)";
-    ctx.strokeStyle = (player.x <= 200 && player.y <= 150) ? "rgba(0, 0, 0, 0.4)" : "rgba(0, 0, 0, 1.0)";
-    ctx.fillRect(SIDEBAR_WIDTH, 0, 200 - SIDEBAR_WIDTH, 150);
-    ctx.strokeRect(SIDEBAR_WIDTH, 0, 200 - SIDEBAR_WIDTH, 150);
-    // Score display
-    ctx.fillStyle = (player.x <= 200 && player.y <= 150) ? "rgba(0, 0, 0, 0.4)" : "rgba(0, 0, 0, 1.0)";
+    ctx.fillStyle = "black";
     ctx.font = "30px Arial";
     ctx.fillText("Score: " + score, SIDEBAR_WIDTH + 20, 50);
     // Level display
@@ -252,14 +247,11 @@ function update(){ // this loop runs 60 times per second
             } else if (platform.y + platform.height > player.y) { // collision from below
                 player.ySpeed = 0.1;
             }
-            if(platform.x + platform.width < player.x){ // collision from right
-                console.log("right");
-                player.x = platform.x + platform.width;
-            }
-            if(platform.x > player.x + player.width){ // collision from left
-                console.log("left");
-                player.x = platform.x - player.width;
-            }
+            console.log("Player X: " + player.x);
+            console.log("Platform height: " + player.width);
+            console.log("Platform X: " + platform.x);
+            console.log("Platform width: " + platform.width);
+            if(player.y + player.width )
         }
     });
     if(!collisionFlag){ // sets player as off the ground if not colliding with anything
