@@ -197,12 +197,7 @@ function update() {
         }
     }
     // Score display
-    ctx.fillStyle = (player.x <= 200 && player.y <= 150) ? "rgba(171, 171, 171, 0.4)" : "rgba(171, 171, 171, 1.0)";
-    ctx.strokeStyle = (player.x <= 200 && player.y <= 150) ? "rgba(0, 0, 0, 0.4)" : "rgba(0, 0, 0, 1.0)";
-    ctx.fillRect(SIDEBAR_WIDTH, 0, 200 - SIDEBAR_WIDTH, 150);
-    ctx.strokeRect(SIDEBAR_WIDTH, 0, 200 - SIDEBAR_WIDTH, 150);
-    // Score display
-    ctx.fillStyle = (player.x <= 200 && player.y <= 150) ? "rgba(0, 0, 0, 0.4)" : "rgba(0, 0, 0, 1.0)";
+    ctx.fillStyle = "black";
     ctx.font = "30px Arial";
     ctx.fillText("Score: " + score, SIDEBAR_WIDTH + 20, 50);
     // Level display
@@ -219,7 +214,8 @@ function update() {
     // Gravity 
     collisionFlag = false;
     platforms.forEach(function (platform) {
-        if (player.x + player.width >= platform.x && player.x <= platform.x + platform.width && player.y + player.height > platform.y && player.y < platform.y + platform.height) {
+        if (player.x + player.width >= platform.x && player.x <= platform.x + platform.width &&
+            player.y + player.height > platform.y && player.y < platform.y + platform.height) {
             collisionFlag = true;
             if (player.ySpeed > 0) { // stop player from falling through platforms
                 player.ySpeed = 0;
@@ -230,14 +226,10 @@ function update() {
             else if (platform.y + platform.height > player.y) { // collision from below
                 player.ySpeed = 0.1;
             }
-            if (platform.x + platform.width < player.x) { // collision from right
-                console.log("right");
-                player.x = platform.x + platform.width;
-            }
-            if (platform.x > player.x + player.width) { // collision from left
-                console.log("left");
-                player.x = platform.x - player.width;
-            }
+            console.log("Player X: " + player.x);
+            console.log("Platform height: " + player.width);
+            console.log("Platform X: " + platform.x);
+            console.log("Platform width: " + platform.width);
         }
     });
     if (!collisionFlag) { // sets player as off the ground if not colliding with anything
