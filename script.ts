@@ -1,51 +1,53 @@
+// Roller
+// a game by Luka Scott
 // *********
 // CONSTANTS
 // *********
 
-const WIDTH = 800;
-const HEIGHT = 800;
-const GRAVITY = 0.1;
-const SPEED_CAP = 10;
-const PLAYER_SIZE = 100;
-const PLATFORM_SPACING_DIST = 500;
-const SIDEBAR_WIDTH = 45; 
-const SPEED_INCREASE = 0.4;
-const SPEED_INCREASE_LENGTH = 100;
+const WIDTH = 800; // canvas width
+const HEIGHT = 800; // canvas height
+const GRAVITY = 0.1; // player y-axis acceleration
+const SPEED_CAP = 10; // speed cap
+const PLAYER_SIZE = 100; // size of player sprite
+const PLATFORM_SPACING_DIST = 500; // distance between platforms
+const SIDEBAR_WIDTH = 45; // width of images on the sides
+const SPEED_INCREASE = 0.4; // how much the camera speed increases
+const SPEED_INCREASE_LENGTH = 100; // how long the speed up is
 
 // *********
 // IMAGES
 // *********
 
-const LEFTSIDE = new Image();
+const LEFTSIDE = new Image(); // left sidebar image
 LEFTSIDE.src = "./assets/leftSide.png";
-const RIGHTSIDE = new Image();
+const RIGHTSIDE = new Image(); // right sidebar image
 RIGHTSIDE.src = "./assets/rightSide.png";
-const LOG = new Image();
+const LOG = new Image(); // player image
 LOG.src = "./assets/log.png";
-const PLATFORM_TEXTURE = new Image();
+const PLATFORM_TEXTURE = new Image(); // platform image
 PLATFORM_TEXTURE.src = "./assets/platform.png";
-const SPLASH_SCREEN = new Image();
+const SPLASH_SCREEN = new Image(); // starting image
 SPLASH_SCREEN.src = "./assets/splash screen.png";
 
 // *********
 // VARIABLES
 // *********
 
-let ctx: CanvasRenderingContext2D;
-let canvas: HTMLCanvasElement;
-let score: number = 0;
-let gameState: "start" | "game" | "end" = "start";
+let ctx: CanvasRenderingContext2D; // drawing context
+let canvas: HTMLCanvasElement; // canvas
+let score: number = 0; // game score
+let gameState: "start" | "game" | "end" = "start"; // state of the game
 let scrollSpeed = 1; // speed the camera scrolls at
 let cameraHeight = 800; // height the camera starts at
 let platformHeight = 100; // height of platforms
-let numPlatforms = 100;
-let platforms: Platform[];
-let player: Player;
+let numPlatforms = 100; // number of platforms generated at once
+let platforms: Platform[]; // array of platforms
+let player: Player; // player object
 let collisionFlag: boolean; // used to check if player hits any platforms.
 let speedChangeFrameCount: number; // used to gradually increase the speed when required
-let speedChanging: boolean = false;
-let lastFrameCollision: boolean = false;
-let keysPressed = {
+let speedChanging: boolean = false; // is speed increasing
+let lastFrameCollision: boolean = false; // was the player colliding last frame
+let keysPressed = { // which keys are being pressed
     left: false,
     right: false,
     z: false,
@@ -63,14 +65,15 @@ class Platform {
     height: number;
     side: "left" | "right" | "centre";
     constructor(y: number, side: "left" | "right" | "centre"){
-        this.x = (side == "left") ? 0 : (side == "right") ? WIDTH - PLATFORM_TEXTURE.width : WIDTH / 2 - PLATFORM_TEXTURE.width / 2;
+        this.x = (side == "left") ? 0 : (side == "right") ? WIDTH - PLATFORM_TEXTURE.width : WIDTH / 2 - PLATFORM_TEXTURE.width / 2; // where the platform starts
         this.y = y;
         this.width = PLATFORM_TEXTURE.width;
         this.height = platformHeight;
         this.side = side;
     }
-    draw(ctx: CanvasRenderingContext2D){
-        ctx.fillStyle = "black";
+    draw(ctx: CanvasRenderingContext2D){ //draws the platform to the canvas
+        //ctx.fillStyle = "black";
+        //ctx.drawRect(this.x, cameraHeight - this.y, this.width, this.height)
         ctx.drawImage(PLATFORM_TEXTURE, this.x, cameraHeight - this.y);
     }
 }
@@ -91,33 +94,33 @@ class Player {
     canDash: boolean;
     canJump: boolean;
     constructor(x: number, y: number, width: number, height: number, image: HTMLImageElement){
-        this.x = x;
-        this.y = y;
-        this.width = width;
-        this.height = height;
-        this.image = image;
-        this.moveSpeed = 10;
-        this.jumpHeight = 65;
-        this.dashLength = 170;
-        this.facing = "right";
-        this.dashing = false;
-        this.ySpeed = 0.1;
-        this.onGround = false;
-        this.canDash = false;
-        this.canJump = false;
+        this.x = x; // player position
+        this.y = y; // "
+        this.width = width; // player size
+        this.height = height; // "
+        this.image = image; // image
+        this.moveSpeed = 10; // horizontal move speed
+        this.jumpHeight = 65; // jump ySpeed
+        this.dashLength = 170; // dash length
+        this.facing = "right"; // direction last moved for dashing
+        this.dashing = false; // is player dashing
+        this.ySpeed = 0.1; // y speed
+        this.onGround = false; // is player on ground (can it jump)
+        this.canDash = false; // prevents holding button down and always moving
+        this.canJump = false; // "
     }
     draw(ctx: CanvasRenderingContext2D){ // draw player
         ctx.drawImage(this.image, this.x, cameraHeight - this.y, this.width, this.height);
         console.log(cameraHeight - this.y, cameraHeight)
     }
-    jump(){
-        if(this.canJump && this.onGround && keysPressed.z){
+    jump(){ // player jump
+        if(this.canJump && this.onGround && keysPressed.z){ 
             console.log("jumping");
             this.ySpeed = -this.jumpHeight;
             this.onGround = false;
         }
     }
-    dash(){
+    dash(){ // dashing
         if (this.canDash && !this.dashing) {
             console.log("dashing");
             this.dashing = true;
@@ -133,7 +136,7 @@ class Player {
             this.dashing = false; 
         }
     }
-    move(){
+    move(){ // walking around
         if(!this.dashing){
             this.y -= this.ySpeed; // might not be neccessary
             if(keysPressed.left){
@@ -146,29 +149,30 @@ class Player {
                 this.x += this.moveSpeed;
             }
         }
-        if(this.x < SIDEBAR_WIDTH){ // keep player from going off screen
+        if(this.x < SIDEBAR_WIDTH){ // keep player from going off screen (left)
             this.x = SIDEBAR_WIDTH;
         }
-        if(this.x > WIDTH - this.width - SIDEBAR_WIDTH){
+        if(this.x > WIDTH - this.width - SIDEBAR_WIDTH){ // keep player from going off screen (right)
             this.x = WIDTH - this.width - SIDEBAR_WIDTH;
         }
     }
 }
 window.onload = function(){ // start function
-    platforms = [];
-    canvas = <HTMLCanvasElement> document.getElementById("mainCanvas")
-    ctx = canvas.getContext("2d");
-    if(gameState == "start"){
+    platforms = []; // inits platforms array
+    canvas = <HTMLCanvasElement> document.getElementById("mainCanvas") // gets canvas dom object
+    ctx = canvas.getContext("2d"); // gets ctx
+    if(gameState == "start"){ // draw splash image
         ctx.drawImage(SPLASH_SCREEN, 0, 0);
     }
+    // initialise event listeners
     window.addEventListener("keydown", keyDownHandler);
     window.addEventListener("keyup", keyUpHandler);
 }
-function gameSetup(){
+function gameSetup(){ // runs once when z is pressed
     if(gameState == "game"){
         // Creates the platforms
         for(let i = 0; i < numPlatforms; i++){
-            let sideDeterminant = Math.random();
+            let sideDeterminant = Math.random(); // is used to randomly generate position of platforms
             platforms[platforms.length] = new Platform(i * PLATFORM_SPACING_DIST, (sideDeterminant <= 0.33) ? "left" : (sideDeterminant <= 0.66) ? "right" : "centre")
         }
         // Creates the player
@@ -217,7 +221,6 @@ function update(){ // this loop runs 60 times per second
         if(speedChangeFrameCount >= SPEED_INCREASE_LENGTH){
             speedChanging = false;
         }
-
     }
     // Score display
     ctx.fillStyle = "black";
@@ -234,11 +237,17 @@ function update(){ // this loop runs 60 times per second
         ctx.fillText("Final Score: " + score, WIDTH/2 - 200, HEIGHT/2 + 50);
         ctx.fillText("Press 'r' to restart", WIDTH/2 - 200, HEIGHT/2 + 100);
     }
-    // Gravity 
+    checkCollision();
+    // Debugging
+    //console.log(cameraHeight);
+    //console.log(platforms);
+    //console.log(player.ySpeed)
+}
+function checkCollision(){
+    // Collision 
     collisionFlag = false;
     platforms.forEach(platform => {
-        if(player.x + player.width >= platform.x && player.x <= platform.x + platform.width && 
-            player.y + player.height > platform.y && player.y < platform.y + platform.height){
+        if(player.x + player.width >= platform.x && player.x <= platform.x + platform.width && player.y + player.height > platform.y && player.y < platform.y + platform.height){
             collisionFlag = true;
             if(player.ySpeed > 0){ // stop player from falling through platforms
                 player.ySpeed = 0;
@@ -248,15 +257,17 @@ function update(){ // this loop runs 60 times per second
             } else if (platform.y + platform.height > player.y) { // collision from below
                 player.ySpeed = 0.1;
             }
-            console.log("Player X: " + player.x);
-            console.log("Platform height: " + player.width);
-            console.log("Platform X: " + platform.x);
-            console.log("Platform width: " + platform.width);
+            //Debugging collision
+            //console.log("Player X: " + player.x);
+            //console.log("Platform height: " + player.width);
+            //console.log("Platform X: " + platform.x);
+            //console.log("Platform width: " + platform.width);
         }
     });
     if(collisionFlag){
         lastFrameCollision = true;
     }
+    // Gravity
     if(!collisionFlag){ // sets player as off the ground if not colliding with anything
         if(lastFrameCollision){
             player.ySpeed += GRAVITY;
@@ -273,17 +284,9 @@ function update(){ // this loop runs 60 times per second
             player.ySpeed = -SPEED_CAP;
         }
     }
-    //if (!player.onGround){
-
-    //}
-    // Debugging
-    //console.log(cameraHeight);
-    //console.log(platforms);
-    //console.log(player.ySpeed)
 }
 // Keyboard input
 function keyDownHandler(event: KeyboardEvent){
-    let key = event.key;
     if(event.key == "z" && gameState == "start"){
         gameState = "game";
         gameSetup();
@@ -308,7 +311,6 @@ function keyDownHandler(event: KeyboardEvent){
     }
 }
 function keyUpHandler(event: KeyboardEvent){
-    let key = event.key;
     if(event.key == "ArrowLeft"){
         keysPressed.left = false;
     } else if (event.key == "ArrowRight"){
