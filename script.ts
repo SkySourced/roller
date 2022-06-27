@@ -36,6 +36,7 @@ SPLASH_SCREEN.src = "./assets/splash screen.png";
 let ctx: CanvasRenderingContext2D; // drawing context
 let canvas: HTMLCanvasElement; // canvas
 let score: number = 0; // game score
+let level: number = 1; // game speed level
 let gameState: "start" | "game" | "end" = "start"; // state of the game
 let scrollSpeed = 1; // speed the camera scrolls at
 let cameraHeight = 800; // height the camera starts at
@@ -206,6 +207,7 @@ function update(){ // this loop runs 60 times per second
         score = Math.floor(player.y / PLATFORM_SPACING_DIST);
         // Attempting to increase scroll speed
         if(score % 5 == 0){
+            level++;
             speedChanging = true;
             speedChangeFrameCount = 0;
         }
@@ -227,7 +229,7 @@ function update(){ // this loop runs 60 times per second
     ctx.font = "30px Arial";
     ctx.fillText("Score: " + score, SIDEBAR_WIDTH + 20, 50);
     // Level display
-    ctx.fillText("Level: " + Math.ceil(score / 5), SIDEBAR_WIDTH + 20, 100);
+    ctx.fillText("Level: " + level, SIDEBAR_WIDTH + 20, 100);
     // Game over
     if(cameraHeight - player.y + player.height > HEIGHT){
         gameState = "end"
