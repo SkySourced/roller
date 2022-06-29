@@ -213,11 +213,11 @@ function update(){ // this loop runs 60 times per second
         }
     }
     if(speedChanging){
-        if(Math.floor(speedChangeFrameCount / 10) % 2 == 0){ // every other 10 frames
-            ctx.fillStyle = "lime";
-            ctx.font = "30px Arial";
-            ctx.fillText("Speed Up!", WIDTH/2 - 100, HEIGHT/2);
-        }
+        //if(Math.floor(speedChangeFrameCount / 10) % 2 == 0){ // every other 10 frames
+        ctx.fillStyle = "lime";
+        ctx.font = "30px Arial";
+        ctx.fillText("Speed Up!", WIDTH/2 - 100, HEIGHT/2);
+        //}
         scrollSpeed += SPEED_INCREASE / SPEED_INCREASE_LENGTH;
         speedChangeFrameCount++;
         if(speedChangeFrameCount >= SPEED_INCREASE_LENGTH){
