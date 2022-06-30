@@ -215,8 +215,8 @@ function update(){ // this loop runs 60 times per second
     if(speedChanging){
         //if(Math.floor(speedChangeFrameCount / 10) % 2 == 0){ // every other 10 frames
         ctx.fillStyle = "lime";
-        ctx.font = "30px Arial";
-        ctx.fillText("Speed Up!", WIDTH/2 - 100, HEIGHT/2);
+        ctx.font = "60px Arial";
+        ctx.fillText("Speed Up!", WIDTH/2 - 130, HEIGHT/2);
         //}
         scrollSpeed += SPEED_INCREASE / SPEED_INCREASE_LENGTH;
         speedChangeFrameCount++;
@@ -235,9 +235,9 @@ function update(){ // this loop runs 60 times per second
         gameState = "end"
         ctx.fillStyle = "black";
         ctx.font = "60px Arial";
-        ctx.fillText("Game Over", WIDTH/2 - 200, HEIGHT/2);
-        ctx.fillText("Final Score: " + score, WIDTH/2 - 200, HEIGHT/2 + 50);
-        ctx.fillText("Press 'r' to restart", WIDTH/2 - 200, HEIGHT/2 + 100);
+        ctx.fillText("Game Over", WIDTH/2 - 200, HEIGHT/2-60);
+        ctx.fillText("Final Score: " + score, WIDTH/2 - 200, HEIGHT/2);
+        ctx.fillText("Press 'r' to restart", WIDTH/2 - 200, HEIGHT/2+60);
     }
     checkCollision();
     // Debugging
