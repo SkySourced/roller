@@ -48,6 +48,7 @@ let collisionFlag: boolean; // used to check if player hits any platforms.
 let speedChangeFrameCount: number; // used to gradually increase the speed when required
 let speedChanging: boolean = false; // is speed increasing
 let lastFrameCollision: boolean = false; // was the player colliding last frame
+let lastPlatformCollided: Platform;
 let keysPressed = { // which keys are being pressed
     left: false,
     right: false,
@@ -251,6 +252,7 @@ function checkCollision(){
     platforms.forEach(platform => {
         if(player.x + player.width >= platform.x && player.x <= platform.x + platform.width && player.y + player.height > platform.y && player.y < platform.y + platform.height){
             collisionFlag = true;
+
             if(player.ySpeed > 0){ // stop player from falling through platforms
                 player.ySpeed = 0;
             }
@@ -259,11 +261,25 @@ function checkCollision(){
             } else if (platform.y + platform.height > player.y) { // collision from below
                 player.ySpeed = 0.1;
             }
+            //else {
+            //     if(platform == lastPlatformCollided){ // if player has glitched into platforms
+            //         if(platform.side == "left"){
+            //             player.x = platform.width;
+            //         } else if(platform.side == "right"){
+            //             player.x = platform.x - player.width;
+            //         } else if(platform.side == "centre" && player.x < WIDTH/2){ // centre from the left
+            //             player.x = platform.x - player.width;
+            //         } else if(platform.side == "centre" && player.x > WIDTH/2){ // centre from the right
+            //             player.x = platform.x + platform.width;
+            //         }
+            //     }
+            // } 
             //Debugging collision
             //console.log("Player X: " + player.x);
             //console.log("Platform height: " + player.width);
             //console.log("Platform X: " + platform.x);
             //console.log("Platform width: " + platform.width);
+            lastPlatformCollided = platform;
         }
     });
     if(collisionFlag){

@@ -43,6 +43,7 @@ var collisionFlag; // used to check if player hits any platforms.
 var speedChangeFrameCount; // used to gradually increase the speed when required
 var speedChanging = false; // is speed increasing
 var lastFrameCollision = false; // was the player colliding last frame
+var lastPlatformCollided;
 var keysPressed = {
     left: false,
     right: false,
@@ -239,11 +240,28 @@ function checkCollision() {
             else if (platform.y + platform.height > player.y) { // collision from below
                 player.ySpeed = 0.1;
             }
+            else {
+                if (platform == lastPlatformCollided) { // if player has glitched into platforms
+                    if (platform.side == "left") {
+                        player.x = platform.width;
+                    }
+                    else if (platform.side == "right") {
+                        player.x = platform.x - player.width;
+                    }
+                    else if (platform.side == "centre" && player.x < WIDTH / 2) { // centre from the left
+                        player.x = platform.x - player.width;
+                    }
+                    else if (platform.side == "centre" && player.x > WIDTH / 2) { // centre from the right
+                        player.x = platform.x + platform.width;
+                    }
+                }
+            }
             //Debugging collision
             //console.log("Player X: " + player.x);
             //console.log("Platform height: " + player.width);
             //console.log("Platform X: " + platform.x);
             //console.log("Platform width: " + platform.width);
+            lastPlatformCollided = platform;
         }
     });
     if (collisionFlag) {
