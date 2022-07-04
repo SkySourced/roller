@@ -116,7 +116,7 @@ class Player {
         console.log(cameraHeight - this.y, cameraHeight)
     }
     jump(){ // player jump
-        if(this.canJump && this.onGround && keysPressed.z){ 
+        if(this.canJump && this.onGround && keysPressed.z){
             console.log("jumping");
             this.ySpeed = -this.jumpHeight;
             this.onGround = false;
@@ -135,7 +135,7 @@ class Player {
             } else if (this.facing == "left" && this.x - this.dashLength < SIDEBAR_WIDTH) {
                 this.x == SIDEBAR_WIDTH; // left dash off screen
             }
-            this.dashing = false; 
+            this.dashing = false;
         }
     }
     move(){ // walking around
@@ -247,7 +247,7 @@ function update(){ // this loop runs 60 times per second
     //console.log(player.ySpeed)
 }
 function checkCollision(){
-    // Collision 
+    // Collision
     collisionFlag = false;
     platforms.forEach(platform => {
         if(player.x + player.width >= platform.x && player.x <= platform.x + platform.width && player.y + player.height > platform.y && player.y < platform.y + platform.height){
@@ -262,18 +262,23 @@ function checkCollision(){
                 player.ySpeed = 0.1;
             }
             //else {
-            //     if(platform == lastPlatformCollided){ // if player has glitched into platforms
-            //         if(platform.side == "left"){
-            //             player.x = platform.width;
-            //         } else if(platform.side == "right"){
-            //             player.x = platform.x - player.width;
-            //         } else if(platform.side == "centre" && player.x < WIDTH/2){ // centre from the left
-            //             player.x = platform.x - player.width;
-            //         } else if(platform.side == "centre" && player.x > WIDTH/2){ // centre from the right
-            //             player.x = platform.x + platform.width;
-            //         }
-            //     }
-            // } 
+            //    if(platform == lastPlatformCollided){ // if player has glitched into platforms
+            //        console.log("glitched into platforms");
+            //        if(platform.side == "left"){
+            //            console.log("left");
+            //            player.x = platform.width;
+            //        } else if(platform.side == "right"){
+            //            console.log("right");
+            //            player.x = platform.x - player.width;
+            //        } else if(platform.side == "centre" && player.x < WIDTH/2){ // centre from the left
+            //            console.log("centre from left");
+            //            player.x = platform.x - player.width;
+            //        } else if(platform.side == "centre" && player.x > WIDTH/2){ // centre from the right
+            //            console.log("centre from right");
+            //            player.x = platform.x + platform.width;
+            //        }
+            //    }
+            //}
             //Debugging collision
             //console.log("Player X: " + player.x);
             //console.log("Platform height: " + player.width);
