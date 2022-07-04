@@ -226,7 +226,7 @@ function update() {
     //console.log(player.ySpeed)
 }
 function checkCollision() {
-    // Collision 
+    // Collision
     collisionFlag = false;
     platforms.forEach(function (platform) {
         if (player.x + player.width >= platform.x && player.x <= platform.x + platform.width && player.y + player.height > platform.y && player.y < platform.y + platform.height) {
@@ -240,22 +240,24 @@ function checkCollision() {
             else if (platform.y + platform.height > player.y) { // collision from below
                 player.ySpeed = 0.1;
             }
-            else {
-                if (platform == lastPlatformCollided) { // if player has glitched into platforms
-                    if (platform.side == "left") {
-                        player.x = platform.width;
-                    }
-                    else if (platform.side == "right") {
-                        player.x = platform.x - player.width;
-                    }
-                    else if (platform.side == "centre" && player.x < WIDTH / 2) { // centre from the left
-                        player.x = platform.x - player.width;
-                    }
-                    else if (platform.side == "centre" && player.x > WIDTH / 2) { // centre from the right
-                        player.x = platform.x + platform.width;
-                    }
-                }
-            }
+            //else {
+            //    if(platform == lastPlatformCollided){ // if player has glitched into platforms
+            //        console.log("glitched into platforms");
+            //        if(platform.side == "left"){
+            //            console.log("left");
+            //            player.x = platform.width;
+            //        } else if(platform.side == "right"){
+            //            console.log("right");
+            //            player.x = platform.x - player.width;
+            //        } else if(platform.side == "centre" && player.x < WIDTH/2){ // centre from the left
+            //            console.log("centre from left");
+            //            player.x = platform.x - player.width;
+            //        } else if(platform.side == "centre" && player.x > WIDTH/2){ // centre from the right
+            //            console.log("centre from right");
+            //            player.x = platform.x + platform.width;
+            //        }
+            //    }
+            //}
             //Debugging collision
             //console.log("Player X: " + player.x);
             //console.log("Platform height: " + player.width);
