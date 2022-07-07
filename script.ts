@@ -151,6 +151,12 @@ class Player {
                 this.x += this.moveSpeed;
             }
         }
+        platforms.forEach(platform => {
+            if(this.x + this.width > platform.x && this.x < platform.x && this.y + this.height > platform.y && this.y < platform.y + platform.height ||
+                this.x < platform.x + platform.width && platform.x + platform.width < this.x && this.y + this.height > platform.y && this.y < platform.y + platform.height){
+                this.facing == "left" ? this.x += this.moveSpeed : this.x -= this.moveSpeed;
+            }
+        })
         if(this.x < SIDEBAR_WIDTH){ // keep player from going off screen (left)
             this.x = SIDEBAR_WIDTH;
         }

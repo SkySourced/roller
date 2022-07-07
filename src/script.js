@@ -116,6 +116,7 @@ var Player = /** @class */ (function () {
         }
     };
     Player.prototype.move = function () {
+        var _this = this;
         if (!this.dashing) {
             this.y -= this.ySpeed; // might not be neccessary
             if (keysPressed.left) {
@@ -129,6 +130,12 @@ var Player = /** @class */ (function () {
                 this.x += this.moveSpeed;
             }
         }
+        platforms.forEach(function (platform) {
+            if (_this.x + _this.width > platform.x && _this.x < platform.x && _this.y + _this.height > platform.y && _this.y < platform.y + platform.height ||
+                _this.x < platform.x + platform.width && platform.x + platform.width < _this.x && _this.y + _this.height > platform.y && _this.y < platform.y + platform.height) {
+                _this.facing == "left" ? _this.x += _this.moveSpeed : _this.x -= _this.moveSpeed;
+            }
+        });
         if (this.x < SIDEBAR_WIDTH) { // keep player from going off screen (left)
             this.x = SIDEBAR_WIDTH;
         }
