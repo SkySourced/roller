@@ -126,7 +126,7 @@ class Player {
         if (this.canDash && !this.dashing) {
             console.log("dashing");
             this.dashing = true;
-            if(this.facing == "right"&& this.x + this.dashLength < WIDTH - SIDEBAR_WIDTH){
+            if(this.facing == "right" && this.x + this.dashLength < WIDTH - SIDEBAR_WIDTH){
                 this.x += this.dashLength; //regular right dash
             } else if (this.facing == "left" && this.x - this.dashLength > SIDEBAR_WIDTH) {
                 this.x -= this.dashLength; //regular left dash
@@ -152,10 +152,12 @@ class Player {
             }
         }
         platforms.forEach(platform => {
-            if(this.x + this.width > platform.x && this.x < platform.x && this.y + this.height > platform.y && this.y < platform.y + platform.height ||
-                this.x < platform.x + platform.width && platform.x + platform.width < this.x && this.y + this.height > platform.y && this.y < platform.y + platform.height){
-                this.facing == "left" ? this.x += this.moveSpeed : this.x -= this.moveSpeed;
+            if(this.x + this.width > platform.x && this.x < platform.x && this.y + this.height - 5 > platform.y && this.y + 5 < platform.y + platform.height){
+                this.x -= this.moveSpeed;
             }
+            if(platform.x + platform.width > this.x && platform.x < this.x + this.width && this.y + this.height - 5 > platform.y && this.y + 5 < platform.y + platform.height){
+                this.x += this.moveSpeed;
+            }       
         })
         if(this.x < SIDEBAR_WIDTH){ // keep player from going off screen (left)
             this.x = SIDEBAR_WIDTH;
