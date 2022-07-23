@@ -112,6 +112,16 @@ class Player {
             else if (this.facing == "left" && this.x - this.dashLength < SIDEBAR_WIDTH) {
                 this.x == SIDEBAR_WIDTH; // left dash off screen
             }
+            platforms.forEach((platform) => {
+                if (this.x + this.dashLength > platform.x && this.x - this.dashLength < platform.x + platform.width && this.y + this.height - 5 > platform.y && this.y + 5 < platform.y + platform.height) {
+                    if (this.facing == "left") {
+                        this.x = platform.x + platform.width;
+                    }
+                    else if (this.facing == "right") {
+                        this.x = platform.x - this.width;
+                    }
+                }
+            });
             this.dashing = false;
         }
     }
