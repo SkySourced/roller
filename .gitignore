@@ -4,3 +4,5 @@ package-lock.json
 tsconfig.json 
 # history of code (i have github)
 .history/
+# photoshop files (using regex to exclude all .psd files in assets folder)
+assets/*.psd
