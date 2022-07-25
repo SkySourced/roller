@@ -1,51 +1,52 @@
-"use strict";
 // Roller
 // a game by Luka Scott
 // *********
 // CONSTANTS
 // *********
-const WIDTH = 800; // canvas width
-const HEIGHT = 800; // canvas height
-const GRAVITY = 0.1; // player y-axis acceleration
-const SPEED_CAP = 10; // speed cap
-const PLAYER_SIZE = 100; // size of player sprite
-const PLATFORM_SPACING_DIST = 500; // distance between platforms
-const SIDEBAR_WIDTH = 45; // width of images on the sides
-const SPEED_INCREASE = 0.4; // how much the camera speed increases
-const SPEED_INCREASE_LENGTH = 100; // how long the speed up is
+var WIDTH = 800; // canvas width
+var HEIGHT = 800; // canvas height
+var GRAVITY = 0.1; // player y-axis acceleration
+var SPEED_CAP = 10; // speed cap
+var PLAYER_SIZE = 100; // size of player sprite
+var PLATFORM_SPACING_DIST = 500; // distance between platforms
+var SIDEBAR_WIDTH = 45; // width of images on the sides
+var SPEED_INCREASE = 0.4; // how much the camera speed increases
+var SPEED_INCREASE_LENGTH = 100; // how long the speed up is
 // *********
 // IMAGES
 // *********
-const LEFTSIDE = new Image(); // left sidebar image
+var LEFTSIDE = new Image(); // left sidebar image
 LEFTSIDE.src = "./assets/leftSide.png";
-const RIGHTSIDE = new Image(); // right sidebar image
+var RIGHTSIDE = new Image(); // right sidebar image
 RIGHTSIDE.src = "./assets/rightSide.png";
-const LOG = new Image(); // player image
+var LOG = new Image(); // player image
 LOG.src = "./assets/log.png";
-const PLATFORM_TEXTURE = new Image(); // platform image
+var PLATFORM_TEXTURE = new Image(); // platform image
 PLATFORM_TEXTURE.src = "./assets/platform.png";
-const SPLASH_SCREEN = new Image(); // starting image
+var SPLASH_SCREEN = new Image(); // starting image
 SPLASH_SCREEN.src = "./assets/splash screen.png";
+var BACKGROUND = new Image(); // background image
+BACKGROUND.src = "./assets/background.png";
 // *********
 // VARIABLES
 // *********
-let ctx; // drawing context
-let canvas; // canvas
-let score = 0; // game score
-let level = 1; // game speed level
-let gameState = "start"; // state of the game
-let scrollSpeed = 1; // speed the camera scrolls at
-let cameraHeight = 800; // height the camera starts at
-let platformHeight = 100; // height of platforms
-let numPlatforms = 100; // number of platforms generated at once
-let platforms; // array of platforms
-let player; // player object
-let collisionFlag; // used to check if player hits any platforms.
-let speedChangeFrameCount; // used to gradually increase the speed when required
-let speedChanging = false; // is speed increasing
-let lastFrameCollision = false; // was the player colliding last frame
-let lastPlatformCollided;
-let keysPressed = {
+var ctx; // drawing context
+var canvas; // canvas
+var score = 0; // game score
+var level = 1; // game speed level
+var gameState = "start"; // state of the game
+var scrollSpeed = 1; // speed the camera scrolls at
+var cameraHeight = 800; // height the camera starts at
+var platformHeight = 100; // height of platforms
+var numPlatforms = 100; // number of platforms generated at once
+var platforms; // array of platforms
+var player; // player object
+var collisionFlag; // used to check if player hits any platforms.
+var speedChangeFrameCount; // used to gradually increase the speed when required
+var speedChanging = false; // is speed increasing
+var lastFrameCollision = false; // was the player colliding last frame
+var lastPlatformCollided;
+var keysPressed = {
     left: false,
     right: false,
     z: false,
@@ -54,22 +55,23 @@ let keysPressed = {
 // *********
 // CLASSES
 // *********
-class Platform {
-    constructor(y, side) {
+var Platform = /** @class */ (function () {
+    function Platform(y, side) {
         this.x = (side == "left") ? 0 : (side == "right") ? WIDTH - PLATFORM_TEXTURE.width : WIDTH / 2 - PLATFORM_TEXTURE.width / 2; // where the platform starts
         this.y = y;
         this.width = PLATFORM_TEXTURE.width;
         this.height = platformHeight;
         this.side = side;
     }
-    draw(ctx) {
+    Platform.prototype.draw = function (ctx) {
         //ctx.fillStyle = "black";
         //ctx.drawRect(this.x, cameraHeight - this.y, this.width, this.height)
         ctx.drawImage(PLATFORM_TEXTURE, this.x, cameraHeight - this.y);
-    }
-}
-class Player {
-    constructor(x, y, width, height, image) {
+    };
+    return Platform;
+}());
+var Player = /** @class */ (function () {
+    function Player(x, y, width, height, image) {
         this.x = x; // player position
         this.y = y; // "
         this.width = width; // player size
@@ -85,18 +87,19 @@ class Player {
         this.canDash = false; // prevents holding button down and always moving
         this.canJump = false; // "
     }
-    draw(ctx) {
+    Player.prototype.draw = function (ctx) {
         ctx.drawImage(this.image, this.x, cameraHeight - this.y, this.width, this.height);
         console.log(cameraHeight - this.y, cameraHeight);
-    }
-    jump() {
+    };
+    Player.prototype.jump = function () {
         if (this.canJump && this.onGround && keysPressed.z) {
             console.log("jumping");
             this.ySpeed = -this.jumpHeight;
             this.onGround = false;
         }
-    }
-    dash() {
+    };
+    Player.prototype.dash = function () {
+        var _this = this;
         if (this.canDash && !this.dashing) {
             console.log("dashing");
             this.dashing = true;
@@ -112,20 +115,21 @@ class Player {
             else if (this.facing == "left" && this.x - this.dashLength < SIDEBAR_WIDTH) {
                 this.x == SIDEBAR_WIDTH; // left dash off screen
             }
-            platforms.forEach((platform) => {
-                if (this.x + this.dashLength > platform.x && this.x - this.dashLength < platform.x + platform.width && this.y + this.height - 5 > platform.y && this.y + 5 < platform.y + platform.height) {
-                    if (this.facing == "left") {
-                        this.x = platform.x + platform.width;
+            platforms.forEach(function (platform) {
+                if (_this.x + _this.dashLength > platform.x && _this.x - _this.dashLength < platform.x + platform.width && _this.y + _this.height - 10 > platform.y && _this.y + 10 < platform.y + platform.height) {
+                    if (_this.facing == "left") {
+                        _this.x = platform.x + platform.width;
                     }
-                    else if (this.facing == "right") {
-                        this.x = platform.x - this.width;
+                    else if (_this.facing == "right") {
+                        _this.x = platform.x - _this.width;
                     }
                 }
             });
             this.dashing = false;
         }
-    }
-    move() {
+    };
+    Player.prototype.move = function () {
+        var _this = this;
         if (!this.dashing) {
             this.y -= this.ySpeed; // might not be neccessary
             if (keysPressed.left) {
@@ -139,12 +143,12 @@ class Player {
                 this.x += this.moveSpeed;
             }
         }
-        platforms.forEach(platform => {
-            if (this.x + this.width > platform.x && this.x < platform.x && this.y + this.height - 5 > platform.y && this.y + 5 < platform.y + platform.height) {
-                this.x -= this.moveSpeed;
+        platforms.forEach(function (platform) {
+            if (_this.x + _this.width > platform.x && _this.x < platform.x && _this.y + _this.height - 10 > platform.y && _this.y + 10 < platform.y + platform.height) {
+                _this.x -= _this.moveSpeed;
             }
-            if (platform.x + platform.width > this.x && platform.x < this.x + this.width && this.y + this.height - 5 > platform.y && this.y + 5 < platform.y + platform.height) {
-                this.x += this.moveSpeed;
+            if (platform.x + platform.width > _this.x && platform.x < _this.x + _this.width && _this.y + _this.height - 10 > platform.y && _this.y + 10 < platform.y + platform.height) {
+                _this.x += _this.moveSpeed;
             }
         });
         if (this.x < SIDEBAR_WIDTH) { // keep player from going off screen (left)
@@ -153,8 +157,9 @@ class Player {
         if (this.x > WIDTH - this.width - SIDEBAR_WIDTH) { // keep player from going off screen (right)
             this.x = WIDTH - this.width - SIDEBAR_WIDTH;
         }
-    }
-}
+    };
+    return Player;
+}());
 window.onload = function () {
     platforms = []; // inits platforms array
     canvas = document.getElementById("mainCanvas"); // gets canvas dom object
@@ -169,8 +174,8 @@ window.onload = function () {
 function gameSetup() {
     if (gameState == "game") {
         // Creates the platforms
-        for (let i = 0; i < numPlatforms; i++) {
-            let sideDeterminant = Math.random(); // is used to randomly generate position of platforms
+        for (var i = 0; i < numPlatforms; i++) {
+            var sideDeterminant = Math.random(); // is used to randomly generate position of platforms
             platforms[platforms.length] = new Platform(i * PLATFORM_SPACING_DIST, (sideDeterminant <= 0.33) ? "left" : (sideDeterminant <= 0.66) ? "right" : "centre");
         }
         // Creates the player
@@ -183,12 +188,14 @@ function update() {
     // Clears the canvas
     ctx.fillStyle = "white";
     ctx.fillRect(0, 0, WIDTH, HEIGHT);
+    // Draws background
+    ctx.drawImage(BACKGROUND, 0, 0, WIDTH, HEIGHT);
     // Increases camera height
     if (gameState == "game") {
         cameraHeight += scrollSpeed;
     }
     // Draws the platforms
-    for (let i = 0; i < platforms.length; i++) {
+    for (var i = 0; i < platforms.length; i++) {
         platforms[i].draw(ctx);
     }
     // Draws the player
@@ -245,7 +252,7 @@ function update() {
 function checkCollision() {
     // Collision
     collisionFlag = false;
-    platforms.forEach(platform => {
+    platforms.forEach(function (platform) {
         if (player.x + player.width >= platform.x && player.x <= platform.x + platform.width && player.y + player.height > platform.y && player.y < platform.y + platform.height) {
             collisionFlag = true;
             if (player.ySpeed > 0) { // stop player from falling through platforms

@@ -28,6 +28,8 @@ const PLATFORM_TEXTURE = new Image(); // platform image
 PLATFORM_TEXTURE.src = "./assets/platform.png";
 const SPLASH_SCREEN = new Image(); // starting image
 SPLASH_SCREEN.src = "./assets/splash screen.png";
+const BACKGROUND = new Image(); // background image
+BACKGROUND.src = "./assets/background.png";
 
 // *********
 // VARIABLES
@@ -136,7 +138,7 @@ class Player {
                 this.x == SIDEBAR_WIDTH; // left dash off screen
             }
             platforms.forEach((platform) => {
-                if(this.x + this.dashLength > platform.x && this.x - this.dashLength < platform.x + platform.width && this.y + this.height - 5 > platform.y && this.y + 5 < platform.y + platform.height){
+                if(this.x + this.dashLength > platform.x && this.x - this.dashLength < platform.x + platform.width && this.y + this.height - 10 > platform.y && this.y + 10 < platform.y + platform.height){
                     if(this.facing == "left"){
                         this.x = platform.x + platform.width;
                     } else if (this.facing == "right"){
@@ -161,10 +163,10 @@ class Player {
             }
         }
         platforms.forEach(platform => {
-            if(this.x + this.width > platform.x && this.x < platform.x && this.y + this.height - 5 > platform.y && this.y + 5 < platform.y + platform.height){
+            if(this.x + this.width > platform.x && this.x < platform.x && this.y + this.height - 10 > platform.y && this.y + 10 < platform.y + platform.height){
                 this.x -= this.moveSpeed;
             }
-            if(platform.x + platform.width > this.x && platform.x < this.x + this.width && this.y + this.height - 5 > platform.y && this.y + 5 < platform.y + platform.height){
+            if(platform.x + platform.width > this.x && platform.x < this.x + this.width && this.y + this.height - 10 > platform.y && this.y + 10 < platform.y + platform.height){
                 this.x += this.moveSpeed;
             }       
         })
@@ -204,6 +206,8 @@ function update(){ // this loop runs 60 times per second
     // Clears the canvas
     ctx.fillStyle = "white";
     ctx.fillRect(0, 0, WIDTH, HEIGHT);
+    // Draws background
+    ctx.drawImage(BACKGROUND, 0, 0, WIDTH, HEIGHT);
     // Increases camera height
     if(gameState == "game"){
         cameraHeight += scrollSpeed;
