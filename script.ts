@@ -30,6 +30,8 @@ const SPLASH_SCREEN = new Image(); // starting image
 SPLASH_SCREEN.src = "./assets/splash screen.png";
 const BACKGROUND = new Image(); // background image
 BACKGROUND.src = "./assets/background.png";
+const BUZZSAW = new Image(); // buzzsaw image
+BUZZSAW.src = "./assets/buzzsaw.png";
 
 // *********
 // VARIABLES
@@ -44,7 +46,9 @@ let scrollSpeed = 1; // speed the camera scrolls at
 let cameraHeight = 800; // height the camera starts at
 let platformHeight = 100; // height of platforms
 let numPlatforms = 100; // number of platforms generated at once
+let numBackgroundElements = 10; // number of background elementsa
 let platforms: Platform[]; // array of platforms
+let backgroundElements: BackgroundElement[]; // array of background elements
 let player: Player; // player object
 let collisionFlag: boolean; // used to check if player hits any platforms.
 let speedChangeFrameCount: number; // used to gradually increase the speed when required
@@ -115,18 +119,18 @@ class Player {
     }
     draw(ctx: CanvasRenderingContext2D){ // draw player
         ctx.drawImage(this.image, this.x, cameraHeight - this.y, this.width, this.height);
-        console.log(cameraHeight - this.y, cameraHeight)
+        //console.log(cameraHeight - this.y, cameraHeight)
     }
     jump(){ // player jump
         if(this.canJump && this.onGround && keysPressed.z){
-            console.log("jumping");
+            //console.log("jumping");
             this.ySpeed = -this.jumpHeight;
             this.onGround = false;
         }
     }
     dash(){ // dashing
-        if (this.canDash && !this.dashing) {
-            console.log("dashing");
+        if (this.canDash && !this.dashing){
+            //console.log("dashing");
             this.dashing = true;
             if(this.facing == "right" && this.x + this.dashLength < WIDTH - SIDEBAR_WIDTH){
                 this.x += this.dashLength; //regular right dash
@@ -151,17 +155,19 @@ class Player {
     }
     move(){ // walking around
         if(!this.dashing){
-            this.y -= this.ySpeed; // might not be neccessary
+            this.y -= this.ySpeed; // might not be necessary
+            // movement
             if(keysPressed.left){
-                console.log("moving left");
+                //console.log("moving left");
                 this.facing = "left";
                 this.x -= this.moveSpeed;
             } else if (keysPressed.right){
-                console.log("moving right");
+                //console.log("moving right");
                 this.facing = "right";
                 this.x += this.moveSpeed;
             }
         }
+        // this loop prevents the player from moving straight into the side of a platform
         platforms.forEach(platform => {
             if(this.x + this.width > platform.x && this.x < platform.x && this.y + this.height - 10 > platform.y && this.y + 10 < platform.y + platform.height){
                 this.x -= this.moveSpeed;
@@ -178,6 +184,47 @@ class Player {
         }
     }
 }
+
+class BackgroundElement {
+    x: number; 
+    y: number; 
+    width: number;
+    height: number; 
+    ySpeed: number; 
+    image: HTMLImageElement | [HTMLImageElement]; // image or array of images
+    frameSpeed: number; // speed of animation
+    framesAlive: number; // number of frames since creation
+    constructor(width: number, height: number, ySpeed: number, image: HTMLImageElement | [HTMLImageElement], frameSpeed: number){
+        this.x = Math.random() * WIDTH; // random x position
+        this.y = 0 - Math.random() * HEIGHT; // random y position above canvas
+        this.width = width;
+        this.height = height;
+        this.ySpeed = ySpeed;
+        this.image = image;
+        this.frameSpeed = frameSpeed;
+        this.framesAlive = 0; // starts at zero frames
+    }
+    draw(ctx: CanvasRenderingContext2D){
+        if(this.image instanceof HTMLImageElement){ // if not animated (not in an array of type [HTMLImageElement])
+            ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
+        } else { // if animated
+            ctx.drawImage(this.image[Math.floor(this.framesAlive % this.frameSpeed) % this.image.length], this.x, this.y, this.width, this.height);
+        }
+    }
+    update(){
+        this.framesAlive++;
+        this.y += this.ySpeed;
+        if(this.y > HEIGHT){
+            this.y = -this.height;
+            this.x = Math.random() * (WIDTH - this.width);
+        }
+    }
+}
+
+// *********
+// MAIN GAME LOOPS
+// *********
+
 window.onload = function(){ // start function
     platforms = []; // inits platforms array
     canvas = <HTMLCanvasElement> document.getElementById("mainCanvas") // gets canvas dom object
@@ -196,6 +243,10 @@ function gameSetup(){ // runs once when z is pressed
             let sideDeterminant = Math.random(); // is used to randomly generate position of platforms
             platforms[platforms.length] = new Platform(i * PLATFORM_SPACING_DIST, (sideDeterminant <= 0.33) ? "left" : (sideDeterminant <= 0.66) ? "right" : "centre")
         }
+        // Creates the background effects
+        for(let i = 0; i < numBackgroundElements; i++){
+            backgroundElements[i] = new BackgroundElement(32, 32, 40, BUZZSAW, 1)
+        }
         // Creates the player
         player = new Player(WIDTH/2, HEIGHT-50, PLAYER_SIZE, PLAYER_SIZE, LOG);
         // Creates the game loop
@@ -208,6 +259,11 @@ function update(){ // this loop runs 60 times per second
     ctx.fillRect(0, 0, WIDTH, HEIGHT);
     // Draws background
     ctx.drawImage(BACKGROUND, 0, 0, WIDTH, HEIGHT);
+    // Draws background elements
+    for(let i = 0; i < numBackgroundElements; i++){
+        backgroundElements[i].draw(ctx);
+        backgroundElements[i].update();
+    }
     // Increases camera height
     if(gameState == "game"){
         cameraHeight += scrollSpeed;
