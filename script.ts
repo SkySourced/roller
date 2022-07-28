@@ -30,8 +30,8 @@ const SPLASH_SCREEN = new Image(); // starting image
 SPLASH_SCREEN.src = "./assets/splash screen.png";
 const BACKGROUND = new Image(); // background image
 BACKGROUND.src = "./assets/background.png";
-const BUZZSAW = new Image(); // buzzsaw image
-BUZZSAW.src = "./assets/buzzsaw.png";
+//const BUZZSAW = new Image(); // buzzsaw image
+//BUZZSAW.src = "./assets/buzzsaw.png";
 
 // *********
 // VARIABLES
@@ -46,9 +46,9 @@ let scrollSpeed = 1; // speed the camera scrolls at
 let cameraHeight = 800; // height the camera starts at
 let platformHeight = 100; // height of platforms
 let numPlatforms = 100; // number of platforms generated at once
-let numBackgroundElements = 10; // number of background elementsa
+//let numBackgroundElements = 10; // number of background elementsa
 let platforms: Platform[]; // array of platforms
-let backgroundElements: BackgroundElement[]; // array of background elements
+//let backgroundElements: BackgroundElement[]; // array of background elements
 let player: Player; // player object
 let collisionFlag: boolean; // used to check if player hits any platforms.
 let speedChangeFrameCount: number; // used to gradually increase the speed when required
@@ -184,7 +184,7 @@ class Player {
         }
     }
 }
-
+/*
 class BackgroundElement {
     x: number; 
     y: number; 
@@ -220,6 +220,7 @@ class BackgroundElement {
         }
     }
 }
+*/
 
 // *********
 // MAIN GAME LOOPS
@@ -244,9 +245,9 @@ function gameSetup(){ // runs once when z is pressed
             platforms[platforms.length] = new Platform(i * PLATFORM_SPACING_DIST, (sideDeterminant <= 0.33) ? "left" : (sideDeterminant <= 0.66) ? "right" : "centre")
         }
         // Creates the background effects
-        for(let i = 0; i < numBackgroundElements; i++){
-            backgroundElements[i] = new BackgroundElement(32, 32, 40, BUZZSAW, 1)
-        }
+        //for(let i = 0; i < numBackgroundElements; i++){
+        //    backgroundElements[i] = new BackgroundElement(32, 32, 40, BUZZSAW, 1)
+        //}
         // Creates the player
         player = new Player(WIDTH/2, HEIGHT-50, PLAYER_SIZE, PLAYER_SIZE, LOG);
         // Creates the game loop
@@ -260,10 +261,10 @@ function update(){ // this loop runs 60 times per second
     // Draws background
     ctx.drawImage(BACKGROUND, 0, 0, WIDTH, HEIGHT);
     // Draws background elements
-    for(let i = 0; i < numBackgroundElements; i++){
-        backgroundElements[i].draw(ctx);
-        backgroundElements[i].update();
-    }
+    //for(let i = 0; i < numBackgroundElements; i++){
+    //    backgroundElements[i].draw(ctx);
+    //    backgroundElements[i].update();
+    //}
     // Increases camera height
     if(gameState == "game"){
         cameraHeight += scrollSpeed;
